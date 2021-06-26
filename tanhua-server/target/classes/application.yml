@@ -1,0 +1,32 @@
+server:
+  port: 10880
+dubbo:
+  application:
+    name: tanhua-server
+  registry:
+    address: zookeeper://127.0.0.1:2181
+  consumer:
+    check: false
+# log
+logging:
+  level:
+    root: info
+    com:
+      tanhua: debug
+  pattern:
+    console: '%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] %msg - %logger{15}%n\'
+
+# redis
+spring:
+  redis:
+    host: 127.0.0.1
+    port: 6379
+
+tanhua:
+  redisValidateCodeKeyPrefix: VALIDATECODE_
+  sms:
+    validateCodeTemplateCode: SMS_204761533
+    signName: 传智播客
+    parameterName: code
+    accessKeyId: LTAI5tPQf9qCNmTUwtAm2zzc
+    accessKeySecret: droBhjw5v0Go2FxSS3bk2dCNP5lsnF
