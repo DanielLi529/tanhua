@@ -17,7 +17,8 @@ dubbo:
   application:
     name: tanhua-dubbo-service
   registry:
-    address: zookeeper://127.0.0.1:2181
+#    address: zookeeper://127.0.0.1:2181
+    address: zookeeper://10.10.20.160:2181
   scan:
     base-packages: com.tanhua.dubbo.api
   provider:

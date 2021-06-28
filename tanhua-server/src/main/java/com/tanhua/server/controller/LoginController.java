@@ -1,13 +1,11 @@
 package com.tanhua.server.controller;
 
-import com.tanhua.domain.vo.ErrorResult;
+import com.tanhua.domain.db.UserInfo;
+import com.tanhua.domain.vo.UserInfoVo;
 import com.tanhua.server.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
@@ -53,6 +51,34 @@ public class LoginController {
         userService.sendValidateCode(phone);
         // 告诉前端结果，是成功的即可，不需要要给他返回数据
         return ResponseEntity.ok(null);
+    }
 
+    /**
+    * @Desc: 使用手机验证码登录注册
+    * @Param: [params]
+    * @return: org.springframework.http.ResponseEntity
+    */
+    @RequestMapping(value = "/loginVerification", method = RequestMethod.POST)
+    public ResponseEntity loginReg(@RequestBody Map<String, String> params){
+        // 从参数中获取手机号和验证码
+        String phone = params.get("phone");
+        String verificationCode = params.get("verificationCode");
+        // 调用service层的方法，获取结果
+        Map<String,Object> map = userService.loginReg(phone,verificationCode);
+        // 告诉前端结果,(为什么要返回结果？)头像等信息吗？
+        return ResponseEntity.ok(map);
+    }
+
+    /**
+    * @Desc: 保存用户信息
+    * @Param: [userInfoVo, token]
+    * @return: org.springframework.http.ResponseEntity
+    */
+    @RequestMapping(value = "/loginReginfo", method = RequestMethod.POST)
+    public ResponseEntity loginRegInfo(@RequestBody UserInfoVo userInfoVo,
+                                       @RequestHeader("Authorization") String token){
+        userService.loginRegInfo(userInfoVo,token);
+        // 告诉前端结果
+        return ResponseEntity.ok(null);
     }
 }
