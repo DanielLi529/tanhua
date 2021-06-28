@@ -14,5 +14,9 @@ public interface UserInfoApi {
      * 通过id更新用户信息
      * @param userInfo
      */
-    void update(UserInfo userInfo);
+    void updateUserInfo(UserInfo userInfo);
+
+    UserInfo getUserInfo(Long id);
+
+    void updateUserHead(UserInfo userInfo);
 }

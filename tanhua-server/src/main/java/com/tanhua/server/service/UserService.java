@@ -2,6 +2,8 @@ package com.tanhua.server.service;
 
 import com.alibaba.fastjson.JSON;
 import com.tanhua.commons.exception.TanHuaException;
+import com.tanhua.commons.templates.FaceTemplate;
+import com.tanhua.commons.templates.OssTemplate;
 import com.tanhua.commons.templates.SmsTemplate;
 import com.tanhua.domain.db.User;
 import com.tanhua.domain.db.UserInfo;
@@ -20,7 +22,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -50,6 +54,31 @@ public class UserService {
 
     @Autowired
     private JwtUtils jwtUtils;
+
+    @Autowired
+    private OssTemplate ossTemplate;
+
+    @Autowired
+    private FaceTemplate faceTemplate;
+
+    /**
+    * @Desc: 通过token获取user对象
+    * @Param: [token]
+    * @return: com.tanhua.domain.db.User
+    */
+    public User getUserStr(String token) {
+        // 验证 token
+        String userStr = redisTemplate.opsForValue().get(header + token);
+
+        if (userStr == null) {
+            return null;
+        }
+        // token 续期
+        redisTemplate.expire(header + token,1,TimeUnit.DAYS);
+
+        // json 转 实体类
+        return JSON.parseObject(userStr, User.class);
+    }
 
     /**
      * 根据手机号查询用户
@@ -110,6 +139,11 @@ public class UserService {
     }
 
 
+    /**
+    * @Desc: 使用验证码登陆注册
+    * @Param: [phone, verificationCode]
+    * @return: java.util.Map<java.lang.String,java.lang.Object>
+    */
     public Map<String, Object> loginReg(String phone, String verificationCode) {
         // 使用手机号从redis取值
         String redisCode = redisTemplate.opsForValue().get(redisValidateCodeKeyPrefix + phone);
@@ -157,13 +191,15 @@ public class UserService {
         return map;
     }
 
+    /**
+    * @Desc: 注册成功存储个人信息
+    * @Param: [userInfoVo, token]
+    * @return: void
+    */
     public void loginRegInfo(UserInfoVo userInfoVo, String token) {
-        // 验证 token
-        String userStr = redisTemplate.opsForValue().get(header + token);
-        // json 转 实体类
-        User user = JSON.parseObject(userStr, User.class);
+        User user = getUserStr(token);
 
-        if (userStr == null) {
+        if (user == null) {
             throw new TanHuaException(ErrorResult.error());
         }
 
@@ -177,5 +213,46 @@ public class UserService {
         // token 存的是账户信息，要设置的是用户的基本信息
         userInfoApi.saveUserInfo(userInfo);
 
+    }
+
+
+    /**
+    * @Desc: 注册成功存储头像
+    * @Param: [headPhoto, token]
+    * @return: void
+    */
+    public void loginRegHead(MultipartFile headPhoto, String token) {
+        try {
+            // 验证 token
+            User user = getUserStr(token);
+
+            if (user == null) {
+                throw new TanHuaException(ErrorResult.error());
+            }
+            // 获取用户id
+            Long id = user.getId();
+
+            // 百度云人脸识别
+            boolean detect = faceTemplate.detect(headPhoto.getBytes());
+
+            // 返回结果为true时，说明是人像
+            if (!detect){
+                throw new TanHuaException(ErrorResult.faceError());
+            }
+
+            // 阿里云上传头像
+            String filename = headPhoto.getOriginalFilename(); // 获取文件的原始名称
+            String headUrl = ossTemplate.upload(filename, headPhoto.getInputStream());
+
+            // 创建 userinfo 对象
+            UserInfo userInfo = new UserInfo();
+            // 设置用户信息
+            userInfo.setId(id);
+            userInfo.setAvatar(headUrl);
+            // 更新用户信息
+            userInfoApi.updateUserInfo(userInfo);
+        } catch (IOException e) {
+            throw new TanHuaException(ErrorResult.error());
+        }
     }
 }

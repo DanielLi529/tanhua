@@ -21,8 +21,8 @@ public class UserApiImpl implements UserApi {
      */
     @Override
     public Long save(User user) {
-        user.setCreated(new Date());
-        user.setUpdated(new Date());
+//        user.setCreated(new Date());
+//        user.setUpdated(new Date());
         userMapper.insert(user);
         return user.getId();
     }

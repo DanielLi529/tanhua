@@ -6,6 +6,7 @@ import com.tanhua.server.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Map;
 
@@ -78,6 +79,16 @@ public class LoginController {
     public ResponseEntity loginRegInfo(@RequestBody UserInfoVo userInfoVo,
                                        @RequestHeader("Authorization") String token){
         userService.loginRegInfo(userInfoVo,token);
+        // 告诉前端结果
+        return ResponseEntity.ok(null);
+    }
+
+
+    // 设置用户头像
+    @RequestMapping(value = "/loginReginfo/head", method = RequestMethod.POST)
+    public ResponseEntity loginRegHead(MultipartFile headPhoto,
+                                       @RequestHeader("Authorization") String token){
+        userService.loginRegHead(headPhoto,token);
         // 告诉前端结果
         return ResponseEntity.ok(null);
     }

@@ -8,7 +8,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 @Data
-public class UserInfo implements Serializable {
+public class UserInfo extends BasePojo{
     @TableId(type= IdType.INPUT)
     private Long id; //用户id
     private String nickname; //昵称
@@ -23,6 +23,6 @@ public class UserInfo implements Serializable {
     private Integer marriage; //婚姻状态
     private String tags; //用户标签：多个用逗号分隔
     private String coverPic; // 封面图片
-    private Date created;
-    private Date updated;
+//    private Date created;
+//    private Date updated;
 }
