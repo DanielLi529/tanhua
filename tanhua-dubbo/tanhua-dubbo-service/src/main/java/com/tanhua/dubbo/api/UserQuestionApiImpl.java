@@ -25,4 +25,21 @@ public class UserQuestionApiImpl implements UserQuestionApi {
         questionQueryWrapper.eq("user_id",userId);
         return userQuestionMapper.selectOne(questionQueryWrapper);
     }
+
+    @Override
+    public void addQuestion(Question question) {
+        userQuestionMapper.insert(question);
+    }
+
+    /**
+    * @Desc: 设置用户问题
+    * @Param: [question, userId]
+    * @return: void
+    */
+    @Override
+    public void updateQuestion(Question question, Long userId) {
+        QueryWrapper<Question> questionQueryWrapper = new QueryWrapper<>();
+        questionQueryWrapper.eq("user_id",userId);
+        userQuestionMapper.update(question,questionQueryWrapper);
+    }
 }

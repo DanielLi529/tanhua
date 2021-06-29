@@ -61,4 +61,34 @@ public class UserSettingService {
         settingsVo.setStrangerQuestion(StrangerQuestion);
         return settingsVo;
     }
+
+    /**
+    * @Desc: 设置陌生人问题
+    * @Param: [content]
+    * @return: void
+    */
+    public void setQuestion(String content) {
+        // 获取用户id
+        Long userId = UserHolder.getUserId();
+
+        // 创建对象
+        Question qt = new Question();
+
+        // 查看数据库是否有相关问题设置
+        Question question = userQuestionApi.selectQuestion(userId);
+        // 存在该条数据
+        if (question != null && question.getTxt() != null){
+            // 设置属性
+            qt.setTxt(content);
+
+            // 执行 update 的方法
+            userQuestionApi.updateQuestion(qt, userId);
+        }else{
+            // 不存在，执行 insert 方法
+            // 设置属性
+            qt.setUserId(userId);
+            qt.setTxt(content);
+            userQuestionApi.addQuestion(qt);
+        }
+    }
 }

@@ -11,4 +11,14 @@ public interface UserQuestionApi {
      * @param userId
      */
     Question selectQuestion(Long userId);
+
+    /**
+    * @Desc: 设置用户问题
+    * @Param: [userId, content]
+    * @return: void
+    */
+
+    void updateQuestion(Question question,Long userId);
+
+    void addQuestion(Question question);
 }
