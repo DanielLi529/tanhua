@@ -4,10 +4,7 @@ import com.tanhua.domain.vo.SettingsVo;
 import com.tanhua.server.service.UserSettingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
@@ -44,6 +41,20 @@ public class UserSettingController {
         return ResponseEntity.ok(null);
     }
 
+    /**
+     * 展示黑名单
+     */
+    @RequestMapping(value = "/blacklist", method = RequestMethod.GET)
+    public ResponseEntity getBlackList(@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "10")  int pagesize) {
+        return userSettingService.getBlackList(page,pagesize);
+    }
 
-
+    /**
+     * 移除黑名单
+     */
+    @RequestMapping(value = "/blacklist/{uid}}", method = RequestMethod.DELETE)
+    public ResponseEntity deleteBlackList(@PathVariable("uid") long delId) {
+        System.out.println(delId);
+        return userSettingService.deleteBlackList(delId);
+    }
 }

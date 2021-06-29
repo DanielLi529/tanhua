@@ -1,16 +1,17 @@
 package com.tanhua.server.service;
 
+import com.sun.org.apache.regexp.internal.RE;
 import com.tanhua.domain.db.Question;
 import com.tanhua.domain.db.Settings;
 import com.tanhua.domain.db.User;
+import com.tanhua.domain.db.UserInfo;
+import com.tanhua.domain.vo.PageResult;
 import com.tanhua.domain.vo.SettingsVo;
-import com.tanhua.dubbo.api.UserApi;
-import com.tanhua.dubbo.api.UserInfoApi;
-import com.tanhua.dubbo.api.UserQuestionApi;
-import com.tanhua.dubbo.api.UserSettingApi;
+import com.tanhua.dubbo.api.*;
 import com.tanhua.server.interceptor.UserHolder;
 import org.apache.dubbo.config.annotation.Reference;
 import org.springframework.beans.BeanUtils;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 /**
@@ -24,6 +25,10 @@ public class UserSettingService {
 
     @Reference
     private UserQuestionApi userQuestionApi;
+
+    @Reference
+    private UserBlackListApi userBlackListApi;
+
 
     /**
     * @Desc: 展示用户通用设置
@@ -90,5 +95,32 @@ public class UserSettingService {
             qt.setTxt(content);
             userQuestionApi.addQuestion(qt);
         }
+    }
+
+    /**
+    * @Desc: 展示黑名单
+    * @Param: [page, pagesize]
+    * @return: org.springframework.http.ResponseEntity
+    */
+    public ResponseEntity getBlackList(int page, int pagesize) {
+        // 获取用户id
+        Long userId = UserHolder.getUserId();
+
+        PageResult<UserInfo> pageResult = userBlackListApi.getBlackList(page, pagesize, userId);
+        return ResponseEntity.ok(pageResult);
+    }
+
+    /**
+    * @Desc: 移除黑名单
+    * @Param: [deleteUserId]
+    * @return: org.springframework.http.ResponseEntity
+    */
+    public ResponseEntity deleteBlackList(long deleteUserId) {
+        // 获取用户id
+        Long userId = UserHolder.getUserId();
+
+        userBlackListApi.deleteBlackList(deleteUserId, userId);
+
+        return ResponseEntity.ok(null);
     }
 }

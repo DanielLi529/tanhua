@@ -3,6 +3,8 @@ package com.tanhua.dubbo.api;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.tanhua.domain.db.Question;
 import com.tanhua.domain.db.Settings;
+import com.tanhua.domain.db.UserInfo;
+import com.tanhua.domain.vo.PageResult;
 
 
 public interface UserQuestionApi {
