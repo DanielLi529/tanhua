@@ -11,9 +11,9 @@ import com.tanhua.domain.vo.ErrorResult;
 import com.tanhua.domain.vo.UserInfoVo;
 import com.tanhua.dubbo.api.UserApi;
 import com.tanhua.dubbo.api.UserInfoApi;
+import com.tanhua.server.interceptor.UserHolder;
 import com.tanhua.server.utils.JwtUtils;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.Reference;
 import org.springframework.beans.BeanUtils;
@@ -196,17 +196,13 @@ public class UserService {
     * @Param: [userInfoVo, token]
     * @return: void
     */
-    public void loginRegInfo(UserInfoVo userInfoVo, String token) {
-        User user = getUserStr(token);
-
-        if (user == null) {
-            throw new TanHuaException(ErrorResult.error());
-        }
+    public void loginRegInfo(UserInfoVo userInfoVo) {
+        // 获取用户 id
+        Long id = UserHolder.getUserId();
 
         // 创建 userinfo 对象
         UserInfo userInfo = new UserInfo();
-        // 设置用户id
-        Long id = user.getId();
+
         // 将 userInfoVo 中的属性值拷贝到 userInfo 实体类中
         BeanUtils.copyProperties(userInfoVo, userInfo);
         userInfo.setId(id);
@@ -221,16 +217,10 @@ public class UserService {
     * @Param: [headPhoto, token]
     * @return: void
     */
-    public void loginRegHead(MultipartFile headPhoto, String token) {
+    public void loginRegHead(MultipartFile headPhoto) {
         try {
-            // 验证 token
-            User user = getUserStr(token);
-
-            if (user == null) {
-                throw new TanHuaException(ErrorResult.error());
-            }
             // 获取用户id
-            Long id = user.getId();
+            Long id = UserHolder.getUserId();
 
             // 百度云人脸识别
             boolean detect = faceTemplate.detect(headPhoto.getBytes());

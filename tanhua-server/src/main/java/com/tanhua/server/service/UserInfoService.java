@@ -10,6 +10,7 @@ import com.tanhua.domain.vo.ErrorResult;
 import com.tanhua.domain.vo.UserInfoVo;
 import com.tanhua.dubbo.api.UserInfoApi;
 import com.tanhua.server.TanhuaServerApplication;
+import com.tanhua.server.interceptor.UserHolder;
 import com.tanhua.server.utils.GetAgeUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.Reference;
@@ -48,15 +49,9 @@ public class UserInfoService {
      * @Param: [token]
      * @return: org.springframework.http.ResponseEntity
      */
-    public UserInfoVo getUserInfo(String token) {
-        // 获取 User 对象
-        User user = userService.getUserStr(token);
-        if (user == null) {
-            throw new TanHuaException(ErrorResult.error());
-        }
-
-        // 获取用户id
-        Long id = user.getId();
+    public UserInfoVo getUserInfo() {
+        // 获取用户 id
+        Long id = UserHolder.getUserId();
 
         // 获取用户信息
         UserInfo userInfo = userInfoApi.getUserInfo(id);
@@ -71,15 +66,9 @@ public class UserInfoService {
         return userInfoVo;
     }
 
-    public void updateUserInfo(UserInfoVo userInfoVo, String token) {
-        // 获取 User 对象
-        User user = userService.getUserStr(token);
-        if (user == null) {
-            throw new TanHuaException(ErrorResult.error());
-        }
-
-        // 获取用户id
-        Long id = user.getId();
+    public void updateUserInfo(UserInfoVo userInfoVo) {
+        // 获取用户 id
+        Long id = UserHolder.getUserId();
 
         UserInfo userInfo = new UserInfo();
         BeanUtils.copyProperties(userInfoVo,userInfo);
@@ -92,16 +81,10 @@ public class UserInfoService {
         userInfoApi.updateUserInfo(userInfo);
     }
 
-    public void updateUserHead(MultipartFile headPhoto, String token) {
+    public void updateUserHead(MultipartFile headPhoto) {
         try {
-            // 获取 User 对象
-            User user = userService.getUserStr(token);
-            if (user == null) {
-                throw new TanHuaException(ErrorResult.error());
-            }
-
-            // 获取用户id
-            Long id = user.getId();
+            // 获取用户 id
+            Long id = UserHolder.getUserId();
 
             // 百度云人脸识别
             boolean detect = faceTemplate.detect(headPhoto.getBytes());

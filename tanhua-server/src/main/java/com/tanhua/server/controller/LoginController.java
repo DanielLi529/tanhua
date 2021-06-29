@@ -76,9 +76,8 @@ public class LoginController {
     * @return: org.springframework.http.ResponseEntity
     */
     @RequestMapping(value = "/loginReginfo", method = RequestMethod.POST)
-    public ResponseEntity loginRegInfo(@RequestBody UserInfoVo userInfoVo,
-                                       @RequestHeader("Authorization") String token){
-        userService.loginRegInfo(userInfoVo,token);
+    public ResponseEntity loginRegInfo(@RequestBody UserInfoVo userInfoVo){
+        userService.loginRegInfo(userInfoVo);
         // 告诉前端结果
         return ResponseEntity.ok(null);
     }
@@ -86,9 +85,8 @@ public class LoginController {
 
     // 设置用户头像
     @RequestMapping(value = "/loginReginfo/head", method = RequestMethod.POST)
-    public ResponseEntity loginRegHead(MultipartFile headPhoto,
-                                       @RequestHeader("Authorization") String token){
-        userService.loginRegHead(headPhoto,token);
+    public ResponseEntity loginRegHead(MultipartFile headPhoto){
+        userService.loginRegHead(headPhoto);
         // 告诉前端结果
         return ResponseEntity.ok(null);
     }
