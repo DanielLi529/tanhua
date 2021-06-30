@@ -1,5 +1,6 @@
 package com.tanhua.server.controller;
 
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import com.tanhua.domain.vo.SettingsVo;
 import com.tanhua.server.service.UserSettingService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,9 +53,20 @@ public class UserSettingController {
     /**
      * 移除黑名单
      */
-    @RequestMapping(value = "/blacklist/{uid}}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/blacklist/{uid}", method = RequestMethod.DELETE)
     public ResponseEntity deleteBlackList(@PathVariable("uid") long delId) {
-        System.out.println(delId);
         return userSettingService.deleteBlackList(delId);
+    }
+
+    /**
+     * 设置
+     */
+    @RequestMapping(value = "/notifications/setting", method = RequestMethod.POST)
+    public ResponseEntity updateNoticeSetting(@RequestBody Map map) {
+        // 获取输入内容
+        Boolean like = (Boolean) map.get("likeNotification");
+        Boolean comment = (Boolean) map.get("pinglunNotification");
+        Boolean notice = (Boolean) map.get("gonggaoNotification");
+        return userSettingService.updateNoticeSetting(like,comment,notice);
     }
 }

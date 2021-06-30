@@ -32,7 +32,7 @@ public class UserQuestionApiImpl implements UserQuestionApi {
     }
 
     /**
-    * @Desc: 设置用户问题
+    * @Desc: 更新用户问题
     * @Param: [question, userId]
     * @return: void
     */

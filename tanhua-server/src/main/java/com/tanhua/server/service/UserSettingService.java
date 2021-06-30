@@ -123,4 +123,42 @@ public class UserSettingService {
 
         return ResponseEntity.ok(null);
     }
+
+    /**
+    * @Desc: 更新通知设置
+    * @Param: [like, comment, notice]
+    * @return: org.springframework.http.ResponseEntity
+    */
+    public ResponseEntity updateNoticeSetting(Boolean like, Boolean comment, Boolean notice) {
+        // 获取用户id
+        Long userId = UserHolder.getUserId();
+
+        // 创建对象
+        Settings newSetting = new Settings();
+
+        // 查看数据库是否有相关问题设置
+        // 查看数据库是否有相关通用设置
+        Settings settings = userSettingApi.selectSettings(userId);
+        // 存在该条数据
+        if (settings != null){
+            // 设置属性
+            // 设置参数
+            newSetting.setLikeNotification(like);
+            newSetting.setGonggaoNotification(notice);
+            newSetting.setPinglunNotification(comment);
+
+            // 执行 update 的方法
+            userSettingApi.updateNoticeSetting(newSetting, userId);
+        }else{
+            // 不存在，执行 insert 方法
+            // 设置属性
+            newSetting.setUserId(userId);
+            newSetting.setLikeNotification(like);
+            newSetting.setGonggaoNotification(notice);
+            newSetting.setPinglunNotification(comment);
+            userSettingApi.addNoticeSetting(newSetting);
+        }
+
+        return ResponseEntity.ok(null);
+    }
 }
