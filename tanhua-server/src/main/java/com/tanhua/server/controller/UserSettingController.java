@@ -59,7 +59,7 @@ public class UserSettingController {
     }
 
     /**
-     * 设置
+     * 用户通用设置
      */
     @RequestMapping(value = "/notifications/setting", method = RequestMethod.POST)
     public ResponseEntity updateNoticeSetting(@RequestBody Map map) {
@@ -68,5 +68,13 @@ public class UserSettingController {
         Boolean comment = (Boolean) map.get("pinglunNotification");
         Boolean notice = (Boolean) map.get("gonggaoNotification");
         return userSettingService.updateNoticeSetting(like,comment,notice);
+    }
+
+    /**
+     * 修改手机号 > 发送验证码
+     */
+    @RequestMapping(value = "/phone/sendVerificationCode", method = RequestMethod.POST)
+    public ResponseEntity sendVerificationCode() {
+        return userSettingService.sendVerificationCode();
     }
 }
