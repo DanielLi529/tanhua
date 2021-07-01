@@ -18,5 +18,10 @@ public interface UserSettingApi {
      */
     void updateNoticeSetting(Settings settings, Long userId);
 
+    /**
+     * @Desc: 更新通知设置
+     * @Param: [like, comment, notice]
+     * @return: org.springframework.http.ResponseEntity
+     */
     void addNoticeSetting(Settings newSetting);
 }

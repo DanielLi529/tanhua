@@ -1,6 +1,8 @@
 package com.tanhua.server.controller;
 
 import com.sun.org.apache.xpath.internal.operations.Bool;
+import com.tanhua.commons.exception.TanHuaException;
+import com.tanhua.domain.vo.ErrorResult;
 import com.tanhua.domain.vo.SettingsVo;
 import com.tanhua.server.service.UserSettingService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,5 +78,33 @@ public class UserSettingController {
     @RequestMapping(value = "/phone/sendVerificationCode", method = RequestMethod.POST)
     public ResponseEntity sendVerificationCode() {
         return userSettingService.sendVerificationCode();
+    }
+
+    /**
+     * 修改手机号 > 校验验证码
+     */
+    @RequestMapping(value = "/phone/checkVerificationCode", method = RequestMethod.POST)
+    public ResponseEntity checkVerificationCode(@RequestBody Map map) {
+        // 获取参数
+        String CheckCode = (String) map.get("verificationCode");
+        System.out.println(CheckCode);
+
+        // 判断验证码是否为空
+        if (CheckCode == null){
+            throw new TanHuaException(ErrorResult.validateCodeError());
+        }
+        Map<String, Boolean> resultMap = userSettingService.checkVerificationCode(CheckCode);
+        return ResponseEntity.ok(resultMap);
+    }
+
+    /**
+     * 修改手机号 > 保存新的手机号码
+     */
+    @RequestMapping(value = "/phone", method = RequestMethod.POST)
+    public ResponseEntity updateMobile(@RequestBody Map map) {
+        // 获取参数
+        String newMobile = (String) map.get("phone");
+        System.out.println(newMobile);
+        return userSettingService.updateMobile(newMobile);
     }
 }

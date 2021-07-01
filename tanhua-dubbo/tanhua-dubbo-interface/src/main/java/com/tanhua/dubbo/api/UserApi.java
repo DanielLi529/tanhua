@@ -17,4 +17,18 @@ public interface UserApi {
      * @return
      */
     User findByMobile(String mobile);
+
+    /**
+     * @Desc: 更新手机号码
+     * @Param: []
+     * @return: org.springframework.http.ResponseEntity
+     */
+    void updateUserInfo(User user, Long userId);
+
+    /**
+    * @Desc: 通过id获取用户对象
+    * @Param: [userId]
+    * @return: java.lang.String
+    */
+    User findUserById(Long userId);
 }

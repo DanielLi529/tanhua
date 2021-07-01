@@ -177,6 +177,7 @@ public class UserService {
             isNew = true;
         }
 
+        // 登陆成功，判断redis中是否已经存在该用户的token
         // 登陆成功  存储token
         String token = jwtUtils.createJWT(phone, user.getId());
 

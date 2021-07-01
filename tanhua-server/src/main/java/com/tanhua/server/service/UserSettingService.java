@@ -1,6 +1,5 @@
 package com.tanhua.server.service;
 
-import com.sun.org.apache.regexp.internal.RE;
 import com.tanhua.commons.exception.TanHuaException;
 import com.tanhua.commons.templates.SmsTemplate;
 import com.tanhua.domain.db.Question;
@@ -20,6 +19,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -37,6 +38,9 @@ public class UserSettingService {
     @Reference
     private UserBlackListApi userBlackListApi;
 
+    @Reference
+    private UserApi userApi;
+
     @Autowired
     private SmsTemplate smsTemplate;
 
@@ -53,8 +57,6 @@ public class UserSettingService {
     * @return: void
     */
     public SettingsVo selectSettings() {
-        // 获取用户对象
-        User user = UserHolder.getUser();
         // 获取用户id
         Long userId = UserHolder.getUserId();
 
@@ -70,6 +72,7 @@ public class UserSettingService {
 
         // 查看数据库是否有相关通用设置
         Settings settings = userSettingApi.selectSettings(userId);
+        // 判断
         if (settings == null){
             settingsVo.setLikeNotification(true);
             settingsVo.setPinglunNotification(true);
@@ -78,8 +81,10 @@ public class UserSettingService {
             BeanUtils.copyProperties(settings,settingsVo);
         }
 
+        // 通过id获取用户对象
+        String mobile = userApi.findUserById(userId).getMobile();
         // 设置 mobile & question
-        settingsVo.setPhone(user.getMobile());
+        settingsVo.setPhone(mobile);
         settingsVo.setStrangerQuestion(StrangerQuestion);
         return settingsVo;
     }
@@ -212,6 +217,54 @@ public class UserSettingService {
         // d.发送成功，将验证码写入redis
         redisTemplate.opsForValue().set(redisValidateCodeKeyPrefix + UserMobile, validateCode, 5, TimeUnit.MINUTES);
 
+        return ResponseEntity.ok(null);
+    }
+
+    /**
+    * @Desc: 修改手机号 > 校验验证码
+    * @Param: [checkCode]
+    * @return: org.springframework.http.ResponseEntity
+    */
+    public Map<String, Boolean> checkVerificationCode(String checkCode) {
+        // 获取用户对象
+        String UserMobile = UserHolder.getUser().getMobile();
+
+        // 创建map集合
+        Map<String, Boolean> map = new HashMap<String, Boolean>();
+
+
+        // 通过用户手机号码从redis中取值
+        String redisCode = redisTemplate.opsForValue().get(redisValidateCodeKeyPrefix + UserMobile);
+
+        // 判断
+        if (!checkCode.equals(redisCode)){
+            map.put("verification",false);
+            return map;
+        }
+        map.put("verification",true);
+
+        // 为防止重复利用该验证码，校验成功之后删除
+        redisTemplate.delete(redisValidateCodeKeyPrefix + UserMobile);// 删除验证码，防止重复提交
+
+        return map;
+    }
+
+    /**
+    * @Desc: 修改手机号 > 保存新的手机号码
+    * @Param: []
+    * @return: org.springframework.http.ResponseEntity
+    */
+    public ResponseEntity updateMobile(String newMobile) {
+        // 获取用户id
+        Long userId = UserHolder.getUserId();
+
+        // 创建对象
+        User user = new User();
+
+        // 设置属性
+        user.setMobile(newMobile);
+
+        userApi.updateUserInfo(user, userId);
         return ResponseEntity.ok(null);
     }
 }

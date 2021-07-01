@@ -26,10 +26,8 @@ public class JwtUtils {
         claims.put("mobile", phone);
         claims.put("id", userId);
         long nowMillis = System.currentTimeMillis();
-        Date now = new Date(nowMillis);
         JwtBuilder builder = Jwts.builder()
             .setClaims(claims)
-            .setIssuedAt(now)
             .signWith(SignatureAlgorithm.HS256, secret);
         return builder.compact();
     }
