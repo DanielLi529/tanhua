@@ -16,7 +16,17 @@ public interface UserInfoApi {
      */
     void updateUserInfo(UserInfo userInfo);
 
+    /**
+    * @Desc: 通过id获取用户信息
+    * @Param: [id]
+    * @return: com.tanhua.domain.db.UserInfo
+    */
     UserInfo getUserInfo(Long id);
 
+    /**
+    * @Desc: 更新用户头像
+    * @Param: [userInfo]
+    * @return: void
+    */
     void updateUserHead(UserInfo userInfo);
 }

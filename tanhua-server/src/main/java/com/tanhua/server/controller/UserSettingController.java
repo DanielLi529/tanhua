@@ -48,7 +48,8 @@ public class UserSettingController {
      * 展示黑名单
      */
     @RequestMapping(value = "/blacklist", method = RequestMethod.GET)
-    public ResponseEntity getBlackList(@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "10")  int pagesize) {
+    public ResponseEntity getBlackList(@RequestParam(defaultValue = "1") int page,
+                                       @RequestParam(defaultValue = "10")  int pagesize) {
         return userSettingService.getBlackList(page,pagesize);
     }
 
