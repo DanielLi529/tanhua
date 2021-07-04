@@ -1,6 +1,7 @@
 package com.tanhua.dubbo.api;
 
 import com.tanhua.domain.mongo.RecommendUser;
+import com.tanhua.domain.vo.PageResult;
 
 
 public interface TodayBestApi {
