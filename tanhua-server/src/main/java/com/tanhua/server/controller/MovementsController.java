@@ -52,4 +52,13 @@ public class MovementsController {
         PageResult pageResult = movementsService.queryRecommendPublishList(page,pagesize);
         return ResponseEntity.ok(pageResult);
     }
+
+    /**
+     * 我的动态
+     */
+    @RequestMapping(value = "/all", method = RequestMethod.GET)
+    public ResponseEntity queryMyPublishList(Integer page, Integer pagesize){
+        PageResult pageResult = movementsService.queryMyPublishList(page,pagesize);
+        return ResponseEntity.ok(pageResult);
+    }
 }

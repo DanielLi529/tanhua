@@ -132,4 +132,40 @@ public class MovementsApiImpl implements MovementsApi {
         PageResult pageResult = new PageResult(counts,(long)pagesize,pages,(long)page,publishes);
         return pageResult;
     }
+
+    /**
+    * @Desc: 我的动态
+    * @Param: [page, pagesize, userId]
+    * @return: com.tanhua.domain.vo.PageResult
+    */
+    @Override
+    public PageResult queryMyPublishList(Integer page, Integer pagesize, Long userId) {
+        // 定义查询条件
+        Query query = new Query();
+        query.with(Sort.by(Sort.Direction.DESC, "created"));
+        query.limit(pagesize).skip((page - 1) * pagesize);
+
+        // 获取十条推荐动态数据
+        List<Album> albums = mongoTemplate.find(query, Album.class, "quanzi_album_" + userId);
+
+        // 获取好友动态的总条数
+        long counts = mongoTemplate.count(query, RecommendQuanzi.class);
+
+        // 创建集合  用来存储查询到的动态数据
+        List<Publish> publishes = new ArrayList<>();
+        for (Album album : albums) {
+            if (album.getPublishId() != null){
+                // 通过发布id取出动态的详细信息
+                Publish publish = mongoTemplate.findById(album.getPublishId(), Publish.class);
+                publishes.add(publish);
+            }
+        }
+
+        // 获取总页数
+        long pages = counts/pagesize + counts%pagesize > 0 ? 1:0;
+
+        // 封装 pageResult 对象
+        PageResult pageResult = new PageResult(counts,(long)pagesize,pages,(long)page,publishes);
+        return pageResult;
+    }
 }

@@ -30,4 +30,11 @@ public interface MovementsApi {
     * @return: com.tanhua.domain.vo.PageResult
     */
     PageResult queryRecommendPublishList(Integer page, Integer pagesize, Long userId);
+
+    /**
+    * @Desc: 我的动态
+    * @Param: [page, pagesize, userId]
+    * @return: com.tanhua.domain.vo.PageResult
+    */
+    PageResult queryMyPublishList(Integer page, Integer pagesize, Long userId);
 }

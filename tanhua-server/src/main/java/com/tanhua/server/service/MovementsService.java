@@ -152,4 +152,50 @@ public class MovementsService {
         }
         return pageResult;
     }
+
+    /**
+    * @Desc: 我的动态
+    * @Param: [page, pagesize]
+    * @return: com.tanhua.domain.vo.PageResult
+    */
+    public PageResult queryMyPublishList(Integer page, Integer pagesize) {
+        List<MomentVo> momentVos = new ArrayList<>();
+
+        // 获取所有的动态信息
+        PageResult pageResult = movementsApi.queryMyPublishList(page,pagesize,UserHolder.getUserId());
+
+        // 循环遍历
+        List<Publish> publishes = pageResult.getItems();
+        if (publishes != null){
+            for (Publish publish : publishes) {
+
+                // 创建 MomentVo 对象
+                MomentVo momentVo = new MomentVo();
+
+                if (publish != null && publish.getUserId() != null){
+                    // 获取每条动态对应的用户信息
+                    UserInfo userInfo = userInfoApi.getUserInfo(publish.getUserId());
+
+                    BeanUtils.copyProperties(userInfo,momentVo);
+
+                    // 设置 tag
+                    if (userInfo.getTags() != null){
+                        momentVo.setTags(userInfo.getTags().split(","));
+                    }
+                    BeanUtils.copyProperties(publish,momentVo);
+
+                    // 设置属性
+                    momentVo.setId(publish.getId().toHexString());
+                    momentVo.setImageContent(publish.getMedias().toArray(new String[]{}));
+                    momentVo.setCreateDate(RelativeDateFormat.format(new Date(publish.getCreated())));
+                    momentVo.setHasLiked(0);
+                    momentVo.setHasLoved(0);
+
+                    momentVos.add(momentVo);
+                }
+            }
+            pageResult.setItems(momentVos);
+        }
+        return pageResult;
+    }
 }
