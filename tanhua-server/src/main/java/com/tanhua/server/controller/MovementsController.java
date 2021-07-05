@@ -2,6 +2,7 @@ package com.tanhua.server.controller;
 
 import com.tanhua.commons.exception.TanHuaException;
 import com.tanhua.domain.vo.ErrorResult;
+import com.tanhua.domain.vo.PageResult;
 import com.tanhua.domain.vo.PublishVo;
 import com.tanhua.domain.vo.SettingsVo;
 import com.tanhua.server.service.MovementsService;
@@ -34,4 +35,21 @@ public class MovementsController {
         return ResponseEntity.ok(null);
     }
 
+    /**
+     * 展示好友动态
+     */
+    @RequestMapping(method = RequestMethod.GET)
+    public ResponseEntity queryFriendPublishList(Integer page, Integer pagesize){
+        PageResult pageResult = movementsService.queryFriendPublishList(page,pagesize);
+        return ResponseEntity.ok(pageResult);
+    }
+
+    /**
+     * 展示推荐动态
+     */
+    @RequestMapping(value = "/recommend", method = RequestMethod.GET)
+    public ResponseEntity queryRecommendPublishList(Integer page, Integer pagesize){
+        PageResult pageResult = movementsService.queryRecommendPublishList(page,pagesize);
+        return ResponseEntity.ok(pageResult);
+    }
 }

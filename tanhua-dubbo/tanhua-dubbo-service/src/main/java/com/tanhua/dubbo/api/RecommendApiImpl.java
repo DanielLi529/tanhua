@@ -23,6 +23,11 @@ public class RecommendApiImpl implements RecommendApi {
     @Autowired
     private MongoTemplate mongoTemplate;
 
+    /**
+    * @Desc: 首页推荐
+    * @Param: [page, pagesize, userId]
+    * @return: com.tanhua.domain.vo.PageResult<com.tanhua.domain.mongo.RecommendUser>
+    */
     @Override
     public PageResult<RecommendUser> findRecommendation(Integer page, Integer pagesize, Long userId) {
 
