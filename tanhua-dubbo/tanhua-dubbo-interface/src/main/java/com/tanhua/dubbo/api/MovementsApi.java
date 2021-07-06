@@ -40,14 +40,14 @@ public interface MovementsApi {
     PageResult queryMyPublishList(Integer page, Integer pagesize, Long userId);
 
     /**
-    * @Desc: 动态点赞
+    * @Desc: 动态评论添加记录
     * @Param: [comment]
     * @return: java.lang.Long
     */
     Long save(Comment comment);
 
     /**
-    * @Desc: 动态取消点赞
+    * @Desc: 动态评论取消评论
     * @Param: [comment]
     * @return: java.lang.Long
     */
