@@ -1,5 +1,6 @@
 package com.tanhua.dubbo.api;
 
+import com.mongodb.client.MongoCollection;
 import com.tanhua.domain.mongo.*;
 import com.tanhua.domain.vo.PageResult;
 import com.tanhua.domain.vo.PublishVo;
@@ -11,6 +12,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +23,32 @@ public class MovementsApiImpl implements MovementsApi {
     @Autowired
     private MongoTemplate mongoTemplate;
 
+
+    /**
+    * @Desc: 定义查询条件
+    * @Param: [page, pagesize]
+    * @return: org.springframework.data.mongodb.core.query.Query
+    */
+    private Query getQueryConditions(Integer page, Integer pagesize) {
+        // 定义查询条件
+        Query query = new Query();
+        query.with(Sort.by(Sort.Direction.DESC, "created"));
+        query.limit(pagesize).skip((page - 1) * pagesize);
+        return query;
+    }
+
+    /**
+    * @Desc: 封装 pageResult
+    * @Param: [page, pagesize, counts, publishes]
+    * @return: com.tanhua.domain.vo.PageResult
+    */
+    private PageResult getPageResult(long page, Integer pagesize, long counts, List<Publish> publishes) {
+        // 获取总页数
+        long pages = counts / pagesize + counts % pagesize > 0 ? 1 : 0;
+
+        // 封装 pageResult 对象
+        return new PageResult(counts, (long) pagesize, pages, page, publishes);
+    }
 
    /**
    * @Desc: 发布动态
@@ -70,10 +98,7 @@ public class MovementsApiImpl implements MovementsApi {
     @Override
     public PageResult queryFriendPublishList(Integer page, Integer pagesize, Long userId) {
         // 通过当前用户的时间线表就能获取到所有好友的动态
-        // 定义查询条件
-        Query query = new Query();
-        query.with(Sort.by(Sort.Direction.DESC, "created"));
-        query.limit(pagesize).skip((page - 1) * pagesize);
+        Query query = getQueryConditions(page, pagesize);
 
         // 获取十条时间线数据
         List<TimeLine> timeLines = mongoTemplate.find(query, TimeLine.class, "quanzi_time_line_" + userId);
@@ -88,12 +113,8 @@ public class MovementsApiImpl implements MovementsApi {
             Publish publish = mongoTemplate.findById(timeLine.getPublishId(), Publish.class);
             publishes.add(publish);
         }
-
-        // 获取总页数
-        long pages = counts/pagesize + counts%pagesize > 0 ? 1:0;
-
-        // 封装 pageResult 对象
-        PageResult pageResult = new PageResult(counts,(long)pagesize,pages,(long)page,publishes);
+        // 封装 返回的数据
+        PageResult pageResult = getPageResult(page, pagesize, counts, publishes);
         return pageResult;
     }
 
@@ -105,9 +126,7 @@ public class MovementsApiImpl implements MovementsApi {
     @Override
     public PageResult queryRecommendPublishList(Integer page, Integer pagesize, Long userId) {
         // 定义查询条件
-        Query query = new Query();
-        query.with(Sort.by(Sort.Direction.DESC, "created"));
-        query.limit(pagesize).skip((page - 1) * pagesize);
+        Query query = getQueryConditions(page, pagesize);
 
         // 获取十条推荐动态数据
         List<RecommendQuanzi> recommendQuanzis = mongoTemplate.find(query, RecommendQuanzi.class);
@@ -124,12 +143,8 @@ public class MovementsApiImpl implements MovementsApi {
                 publishes.add(publish);
             }
         }
-
-        // 获取总页数
-        long pages = counts/pagesize + counts%pagesize > 0 ? 1:0;
-
-        // 封装 pageResult 对象
-        PageResult pageResult = new PageResult(counts,(long)pagesize,pages,(long)page,publishes);
+        // 封装 返回的数据
+        PageResult pageResult = getPageResult(page, pagesize, counts, publishes);
         return pageResult;
     }
 
@@ -141,9 +156,7 @@ public class MovementsApiImpl implements MovementsApi {
     @Override
     public PageResult queryMyPublishList(Integer page, Integer pagesize, Long userId) {
         // 定义查询条件
-        Query query = new Query();
-        query.with(Sort.by(Sort.Direction.DESC, "created"));
-        query.limit(pagesize).skip((page - 1) * pagesize);
+        Query query = getQueryConditions(page, pagesize);
 
         // 获取十条推荐动态数据
         List<Album> albums = mongoTemplate.find(query, Album.class, "quanzi_album_" + userId);
@@ -160,12 +173,90 @@ public class MovementsApiImpl implements MovementsApi {
                 publishes.add(publish);
             }
         }
-
-        // 获取总页数
-        long pages = counts/pagesize + counts%pagesize > 0 ? 1:0;
-
-        // 封装 pageResult 对象
-        PageResult pageResult = new PageResult(counts,(long)pagesize,pages,(long)page,publishes);
+        // 封装 返回的数据
+        PageResult pageResult = getPageResult(page, pagesize, counts, publishes);
         return pageResult;
+    }
+
+    /**
+    * @Desc: 动态点赞
+    * @Param: [comment]
+    * @return: java.lang.Long
+    */
+    @Override
+    public Long save(Comment comment) {
+        // 添加 comment
+        mongoTemplate.save(comment);
+
+        // 更新当前动态的喜欢数量
+        updateCount(comment,+1);
+
+        // 获取动态更新后的喜欢数量
+        long count = getCount(comment);
+
+        return count;
+    }
+
+    /**
+    * @Desc: 动态取消点赞
+    * @Param: [comment]
+    * @return: java.lang.Long
+    */
+    @Override
+    public Long Remove(Comment comment) {
+        // 删除 comment 的记录
+        Query query = new Query();
+        query.addCriteria(Criteria.where("publishId").is(comment.getPublishId())
+                .and("commentType").is(comment.getCommentType())
+                .and("userId").is(comment.getUserId())
+        );
+
+        mongoTemplate.remove(query,Comment.class);
+
+        // 更新当前动态的喜欢数量
+        updateCount(comment,-1);
+
+        // 获取动态更新后的喜欢数量
+        long count = getCount(comment);
+        return count;
+    }
+
+    /**
+    * @Desc: 更新动态表中对应的计数值
+    * @Param: [comment, value]
+    * @return: void
+    */
+    private void updateCount(Comment comment,int value){
+        Query updateQuery = new Query();
+        updateQuery.addCriteria(Criteria.where("id").is(comment.getPublishId()));
+        Update update = new Update();
+        update.inc(comment.getCol(),value);
+        mongoTemplate.updateFirst(updateQuery,update,Publish.class);
+    }
+
+    /**
+    * @Desc: 获取当前动态的评论数量
+    * @Param: [comment]
+    * @return: long
+    */
+    private long getCount(Comment comment){
+        Query query = new Query(Criteria.where("id").is(comment.getPublishId()));
+        if(comment.getPubType() == 1){
+            Publish publish = mongoTemplate.findOne(query, Publish.class);
+            if(comment.getCommentType() == 1){// //评论类型，1-点赞，2-评论，3-喜欢
+                return (long)publish.getLikeCount();
+            }
+            if(comment.getCommentType() == 2){// //评论类型，1-点赞，2-评论，3-喜欢
+                return (long)publish.getCommentCount();
+            }
+            if(comment.getCommentType() == 3){// //评论类型，1-点赞，2-评论，3-喜欢
+                return (long)publish.getLoveCount();
+            }
+        }
+        if(comment.getPubType() == 3){
+            Comment cm = mongoTemplate.findOne(query, Comment.class);
+            return (long)cm.getLikeCount();
+        }
+        return 99l;
     }
 }

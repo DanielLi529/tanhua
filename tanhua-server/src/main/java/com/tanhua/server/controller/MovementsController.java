@@ -7,6 +7,7 @@ import com.tanhua.domain.vo.PublishVo;
 import com.tanhua.domain.vo.SettingsVo;
 import com.tanhua.server.service.MovementsService;
 import com.tanhua.server.service.UserSettingService;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -60,5 +61,23 @@ public class MovementsController {
     public ResponseEntity queryMyPublishList(Integer page, Integer pagesize){
         PageResult pageResult = movementsService.queryMyPublishList(page,pagesize);
         return ResponseEntity.ok(pageResult);
+    }
+
+    /**
+     * 动态点赞
+     */
+    @RequestMapping(value = "/{id}/like", method = RequestMethod.GET)
+    public ResponseEntity<Long> like(@PathVariable("id") String publishId) {
+        Long total = movementsService.like(publishId);
+        return ResponseEntity.ok(total);
+    }
+
+    /**
+     * 动态取消点赞
+     */
+    @RequestMapping(value = "/{id}/dislike", method = RequestMethod.GET)
+        public ResponseEntity<Long> unlike(@PathVariable("id") String publishId){
+            Long total = movementsService.unLike(publishId);
+            return ResponseEntity.ok(total);
     }
 }

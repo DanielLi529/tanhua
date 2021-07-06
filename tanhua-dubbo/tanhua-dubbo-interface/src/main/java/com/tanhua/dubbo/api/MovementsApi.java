@@ -1,6 +1,7 @@
 package com.tanhua.dubbo.api;
 
 import com.tanhua.domain.db.Settings;
+import com.tanhua.domain.mongo.Comment;
 import com.tanhua.domain.mongo.Publish;
 import com.tanhua.domain.vo.PageResult;
 import com.tanhua.domain.vo.PublishVo;
@@ -37,4 +38,18 @@ public interface MovementsApi {
     * @return: com.tanhua.domain.vo.PageResult
     */
     PageResult queryMyPublishList(Integer page, Integer pagesize, Long userId);
+
+    /**
+    * @Desc: 动态点赞
+    * @Param: [comment]
+    * @return: java.lang.Long
+    */
+    Long save(Comment comment);
+
+    /**
+    * @Desc: 动态取消点赞
+    * @Param: [comment]
+    * @return: java.lang.Long
+    */
+    Long Remove(Comment comment);
 }

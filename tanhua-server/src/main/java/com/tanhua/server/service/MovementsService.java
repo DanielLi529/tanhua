@@ -2,6 +2,7 @@ package com.tanhua.server.service;
 
 import com.tanhua.commons.templates.OssTemplate;
 import com.tanhua.domain.db.UserInfo;
+import com.tanhua.domain.mongo.Comment;
 import com.tanhua.domain.mongo.MomentVo;
 import com.tanhua.domain.mongo.Publish;
 import com.tanhua.domain.vo.PageResult;
@@ -11,8 +12,11 @@ import com.tanhua.dubbo.api.UserInfoApi;
 import com.tanhua.server.interceptor.UserHolder;
 import com.tanhua.server.utils.RelativeDateFormat;
 import org.apache.dubbo.config.annotation.Reference;
+import org.bson.types.ObjectId;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -35,6 +39,9 @@ public class MovementsService {
 
     @Autowired
     private OssTemplate ossTemplate;
+
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     /**
      * @Desc: 展示用户通用设置
@@ -98,6 +105,14 @@ public class MovementsService {
                     momentVo.setHasLiked(0);
                     momentVo.setHasLoved(0);
 
+                    // 判断当前登录用户是否已经点赞
+                    String key = "publish_like_" + UserHolder.getUserId() +"_" + publish.getId();
+                    if (redisTemplate.hasKey(key)){
+                        momentVo.setHasLiked(1);
+                    }else{
+                        momentVo.setHasLiked(0);
+                    }
+
                     momentVos.add(momentVo);
                 }
             }
@@ -145,6 +160,14 @@ public class MovementsService {
                     momentVo.setHasLiked(0);
                     momentVo.setHasLoved(0);
 
+                    // 判断当前登录用户是否已经点赞
+                    String key = "publish_like_" + UserHolder.getUserId() +"_" + publish.getId();
+                    if (redisTemplate.hasKey(key)){
+                        momentVo.setHasLiked(1);
+                    }else{
+                        momentVo.setHasLiked(0);
+                    }
+
                     momentVos.add(momentVo);
                 }
             }
@@ -191,11 +214,69 @@ public class MovementsService {
                     momentVo.setHasLiked(0);
                     momentVo.setHasLoved(0);
 
+                    // 判断当前登录用户是否已经点赞
+                    String key = "publish_like_" + UserHolder.getUserId() +"_" + publish.getId();
+                    if (redisTemplate.hasKey(key)){
+                        momentVo.setHasLiked(1);
+                    }else{
+                        momentVo.setHasLiked(0);
+                    }
+
                     momentVos.add(momentVo);
                 }
             }
             pageResult.setItems(momentVos);
         }
         return pageResult;
+    }
+
+    /**
+    * @Desc: 动态点赞
+    * @Param: [id]
+    * @return: java.lang.Long
+    */
+    public Long like(String publishId) {
+
+        // 创建Comment
+        Comment comment = new Comment();
+        // 设置点赞属性
+        comment.setUserId(UserHolder.getUserId());
+        comment.setCommentType(1); // 点赞
+        comment.setPubType(1); // 对动态操作
+        comment.setPublishId(new ObjectId(publishId));
+        comment.setId(new ObjectId());
+        comment.setCreated(System.currentTimeMillis());
+
+        // 添加评论信息
+        Long total = movementsApi.save(comment);
+
+        // 在 redis中保存这条数据
+        String key = "publish_like_" + UserHolder.getUserId() +"_" + publishId;
+        redisTemplate.opsForValue().set(key,"1");
+        return total;
+    }
+
+    /**
+    * @Desc: 动态取消点赞
+    * @Param: [id]
+    * @return: java.lang.Long
+    */
+    public Long unLike(String publishId) {
+        // 创建Comment
+        Comment comment = new Comment();
+        // 设置点赞属性
+        comment.setUserId(UserHolder.getUserId());
+        comment.setCommentType(1); // 点赞
+        comment.setPubType(1); // 对动态操作
+        comment.setPublishId(new ObjectId(publishId));
+        comment.setId(new ObjectId());
+        comment.setCreated(System.currentTimeMillis());
+
+        // 更新动态发布表中对应的 likeCount 数量
+        Long total = movementsApi.Remove(comment);
+        // 删除redis中的记录
+        redisTemplate.delete("publish_like_" + UserHolder.getUserId() +"_" + publishId);
+
+        return total;
     }
 }
