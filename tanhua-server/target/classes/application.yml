@@ -22,7 +22,9 @@ spring:
 #    host: 127.0.0.1
     host: 10.10.20.160
     port: 6379
-
+  servlet:
+    multipart:
+      max-file-size: 10MB
 fdfs:
   so-timeout: 1500
   connect-timeout: 600

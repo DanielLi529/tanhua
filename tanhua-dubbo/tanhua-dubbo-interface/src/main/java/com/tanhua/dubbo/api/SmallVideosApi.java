@@ -12,4 +12,11 @@ public interface SmallVideosApi {
      * @param
      */
     void saveSmallVideo(Video video);
+
+    /**
+    * @Desc: 分页查询小视频
+    * @Param: [page, pagesize]
+    * @return: com.tanhua.domain.vo.PageResult
+    */
+    PageResult querySmallVideoList(Integer page, Integer  pagesize, Long userId);
 }
