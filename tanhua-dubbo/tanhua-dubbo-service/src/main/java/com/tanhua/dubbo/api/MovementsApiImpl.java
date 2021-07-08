@@ -259,4 +259,14 @@ public class MovementsApiImpl implements MovementsApi {
         }
         return 99l;
     }
+
+    /**
+     * @Desc: 获取当前动态的详细信息
+     * @Param: [movementId]
+     * @return: com.tanhua.domain.mongo.Publish
+     */
+    @Override
+    public Publish queryPublishById(String publishId) {
+        return mongoTemplate.findById(new ObjectId(publishId), Publish.class);
+    }
 }

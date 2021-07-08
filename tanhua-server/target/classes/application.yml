@@ -23,6 +23,17 @@ spring:
     host: 10.10.20.160
     port: 6379
 
+fdfs:
+  so-timeout: 1500
+  connect-timeout: 600
+  #缩略图生成参数
+  thumb-image:
+    width: 150
+    height: 150
+  #TrackerList参数,支持多个
+  tracker-list: 10.10.20.160:22122
+  web-server-url: http://10.10.20.160:8888/
+
 tanhua:
   header: TOKEN_
   secret: 76bd425b6f29f7fcc2e0bfc286043df1

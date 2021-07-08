@@ -16,7 +16,11 @@ import org.bson.types.ObjectId;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -349,5 +353,43 @@ public class MovementsService {
         redisTemplate.delete("publish_love_" + UserHolder.getUserId() +"_" + publishId);
 
         return total;
+    }
+
+
+    /**
+     * @Desc: 获取单个动态的评论
+     * @Param: [movementId]
+     * @return: com.tanhua.domain.vo.PageResult<com.tanhua.domain.vo.CommentVo>
+     */
+    public MomentVo queryComment(String publishId) {
+        // 获取当前动态信息
+        Publish publish = movementsApi.queryPublishById(publishId);
+
+        // 创建 momentVo 对象
+        MomentVo momentVo = new MomentVo();
+
+        BeanUtils.copyProperties(publish, momentVo);
+        // 通过动态信息获取当前用户的个人信息
+        if (publish != null) {
+            UserInfo userInfo = userInfoApi.getUserInfo(publish.getUserId());
+
+            if (userInfo != null) {
+                BeanUtils.copyProperties(userInfo, momentVo);
+                if (userInfo.getTags() != null) {
+                    momentVo.setTags(userInfo.getTags().split(","));
+                }
+            }
+        }
+
+        // 给 MomentVo 对象赋值
+        momentVo.setId(publish.getId().toHexString());
+        momentVo.setImageContent(publish.getMedias().toArray(new String[]{}));
+        momentVo.setDistance("0");
+        momentVo.setCreateDate(RelativeDateFormat.format(new Date(publish.getCreated())));
+        momentVo.setHasLiked(0);  //是否点赞  0：未点 1:点赞
+        momentVo.setHasLoved(0);  //是否喜欢  0：未点 1:点赞
+
+        // 返回数据
+        return momentVo;
     }
 }

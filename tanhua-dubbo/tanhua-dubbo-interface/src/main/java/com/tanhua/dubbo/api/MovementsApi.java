@@ -52,4 +52,11 @@ public interface MovementsApi {
     * @return: java.lang.Long
     */
     Long Remove(Comment comment);
+
+    /**
+     * @Desc: 获取当前动态的详细信息
+     * @Param: [movementId]
+     * @return: com.tanhua.domain.mongo.Publish
+     */
+    Publish queryPublishById(String publishId);
 }

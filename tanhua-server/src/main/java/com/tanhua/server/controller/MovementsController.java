@@ -1,5 +1,6 @@
 package com.tanhua.server.controller;
 
+import com.tanhua.domain.mongo.MomentVo;
 import com.tanhua.domain.vo.PageResult;
 import com.tanhua.domain.vo.PublishVo;
 import com.tanhua.server.service.MovementsService;
@@ -93,5 +94,14 @@ public class MovementsController {
     public ResponseEntity<Long> unlove(@PathVariable("id") String publishId) {
         Long total = movementsService.unlove(publishId);
         return ResponseEntity.ok(total);
+    }
+
+    /**
+     * 查询单条动态
+     */
+    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
+    public ResponseEntity queryComments(@PathVariable("id") String publishId) {
+        MomentVo momentVo = movementsService.queryComment(publishId);
+        return ResponseEntity.ok(momentVo);
     }
 }
