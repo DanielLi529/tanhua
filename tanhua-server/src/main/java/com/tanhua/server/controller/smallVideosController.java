@@ -5,10 +5,7 @@ import com.tanhua.domain.vo.VideoVo;
 import com.tanhua.server.service.SmallVideosService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -42,4 +39,21 @@ public class smallVideosController {
         return ResponseEntity.ok(pageResult);
     }
 
+    /**
+     * 关注视频用户
+     */
+    @RequestMapping(value = "/{uid}/userFocus",method = RequestMethod.POST)
+    public ResponseEntity followUser(@PathVariable("uid") Long userId){
+        smallVideosService.followUser(userId);
+        return ResponseEntity.ok(null);
+    }
+
+    /**
+     * 取消关注视频用户
+     */
+    @RequestMapping(value = "/{uid}/userUnFocus",method = RequestMethod.POST)
+    public ResponseEntity unfollowUser(@PathVariable("uid") Long userId){
+        smallVideosService.unfollowUser(userId);
+        return ResponseEntity.ok(null);
+    }
 }

@@ -63,4 +63,47 @@ public class SmallVideosApiImpl implements SmallVideosApi {
         return pageResult;
     }
 
+    /**
+    * @Desc: 查询关注表内有没有这条数据
+    * @Param: [userId, toUserId]
+    * @return: com.tanhua.domain.mongo.FollowUser
+    */
+    @Override
+    public List<FollowUser> queryFollow(Long userId, Long toUserId) {
+        // 定义查询条件
+        Query query = new Query();
+        query.addCriteria(Criteria.where("userId").is(userId)
+                .and("followUserId").is(toUserId));
+
+        List<FollowUser> followUsers = mongoTemplate.find(query, FollowUser.class);
+        return followUsers;
+    }
+
+    /**
+    * @Desc: 向关注表中插入数据
+    * @Param: [userId, toUserId]
+    * @return: void
+    */
+    @Override
+    public void saveFollowUser(FollowUser followUser) {
+        followUser.setCreated(System.currentTimeMillis());
+        mongoTemplate.save(followUser);
+    }
+
+    /**
+    * @Desc: 取消关注，删除数据
+    * @Param:
+    * @return:
+    */
+    @Override
+    public void removeFollowUser(Long userId, Long toUserId) {
+        // 定义查询条件
+        Query query = new Query();
+        query.addCriteria(Criteria.where("userId").is(userId)
+                .and("followUserId").is(toUserId));
+
+        // 删除记录
+        mongoTemplate.remove(query,FollowUser.class);
+    }
+
 }

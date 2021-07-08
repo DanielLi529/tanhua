@@ -6,6 +6,7 @@ import com.github.tobato.fastdfs.domain.fdfs.StorePath;
 import com.github.tobato.fastdfs.service.FastFileStorageClient;
 import com.tanhua.commons.templates.OssTemplate;
 import com.tanhua.domain.db.UserInfo;
+import com.tanhua.domain.mongo.FollowUser;
 import com.tanhua.domain.mongo.Video;
 import com.tanhua.domain.vo.PageResult;
 import com.tanhua.domain.vo.PublishVo;
@@ -14,14 +15,17 @@ import com.tanhua.dubbo.api.SmallVideosApi;
 import com.tanhua.dubbo.api.UserInfoApi;
 import com.tanhua.server.interceptor.UserHolder;
 import org.apache.dubbo.config.annotation.Reference;
+import org.bson.types.ObjectId;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -38,6 +42,9 @@ public class SmallVideosService {
 
     @Autowired
     private FdfsWebServer fdfsWebServer;
+
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     @Autowired
     private FastFileStorageClient fastFileStorageClient;
@@ -109,7 +116,14 @@ public class SmallVideosService {
                 // 为对象赋值
                 videoVo.setCover(video.getPicUrl()); // 封面
                 videoVo.setUserId(video.getUserId()); // 发布人的userId
-                videoVo.setHasFocus(0); // 是否关注
+                // 判断当前登录用户是否已经关注
+                String key = "publish_love_" + UserHolder.getUserId() +"_" + video.getUserId();
+                if(redisTemplate.opsForValue().get(key) != null){
+                    videoVo.setHasFocus(1); // 已关注
+                }else {
+                    videoVo.setHasFocus(0); // 没有关注
+                }
+
                 videoVo.setHasLiked(0); // 是否点赞
                 if(video.getText() != null){
                     videoVo.setSignature(video.getText());//签名
@@ -125,5 +139,51 @@ public class SmallVideosService {
         pageResult.setItems(videoVos);
 
         return pageResult;
+    }
+
+    /**
+    * @Desc: 关注视频用户
+    * @Param: [userId]
+    * @return: void
+    */
+    public void followUser(Long toUserId) {
+
+        // 查询当前登录用户是否已关注该视频用户
+        Long userId = UserHolder.getUserId();
+        List<FollowUser> list = smallVideosApi.queryFollow(userId,toUserId);
+
+        if (list.size() == 0){
+            FollowUser followUser = new FollowUser();
+            // 构建对象
+            followUser.setId(ObjectId.get());
+            followUser.setUserId(userId);
+            followUser.setFollowUserId(toUserId);
+            // 没有则插入数据
+            smallVideosApi.saveFollowUser(followUser);
+
+            // 在 redis中保存这条数据
+            String key = "publish_love_" + userId +"_" + toUserId;
+            redisTemplate.opsForValue().set(key,"1");
+        }
+    }
+
+    /**
+    * @Desc: 取消关注视频用户
+    * @Param: [userId]
+    * @return: void
+    */
+    public void unfollowUser(Long toUserId) {
+        // 查询当前登录用户是否已关注该视频用户
+        Long userId = UserHolder.getUserId();
+        List<FollowUser> list = smallVideosApi.queryFollow(userId,toUserId);
+
+        if (list.size() == 0){
+            // 没有则删除数据
+            smallVideosApi.removeFollowUser(userId,toUserId);
+
+            // 在 redis中保存这条数据
+            String key = "publish_love_" + userId +"_" + toUserId;
+            redisTemplate.delete(key);
+        }
     }
 }
