@@ -49,4 +49,14 @@ public class TodayBestController {
         TodayBestVo todayBestVo = todayBestService.findPersonInfo(id);
         return ResponseEntity.ok(todayBestVo);
     }
+
+    /**
+     * 查询佳人的问题
+     */
+    @RequestMapping(value = "/strangerQuestions", method = RequestMethod.GET)
+        public ResponseEntity findPersonQuestion(Long id) {
+        // 调用 service
+        String question = todayBestService.findPersonQuestion(id);
+        return ResponseEntity.ok(question);
+    }
 }

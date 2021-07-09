@@ -1,6 +1,7 @@
 package com.tanhua.server.service;
 
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
+import com.tanhua.domain.db.Question;
 import com.tanhua.domain.db.UserInfo;
 import com.tanhua.domain.mongo.RecommendUser;
 import com.tanhua.domain.vo.PageResult;
@@ -9,6 +10,7 @@ import com.tanhua.domain.vo.TodayBestVo;
 import com.tanhua.dubbo.api.RecommendApi;
 import com.tanhua.dubbo.api.TodayBestApi;
 import com.tanhua.dubbo.api.UserInfoApi;
+import com.tanhua.dubbo.api.UserQuestionApi;
 import com.tanhua.server.interceptor.UserHolder;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -33,6 +35,9 @@ public class TodayBestService {
 
     @Reference
     private RecommendApi recommendApi;
+
+    @Reference
+    private UserQuestionApi userQuestionApi;
 
     /**
      * @Desc: 每日佳人
@@ -169,5 +174,25 @@ public class TodayBestService {
         // 设置缘分值
         todayBestVo.setFateValue(bestUser.getScore().longValue());
         return todayBestVo;
+    }
+
+    /**
+    * @Desc: 查询佳人的问题
+    * @Param: [id]
+    * @return: java.lang.String
+    */
+    public String findPersonQuestion(Long id) {
+
+        // 查看数据库是否有相关问题设置
+        Question question = userQuestionApi.selectQuestion(id);
+        // 存在该条数据
+        if (question != null && question.getTxt() != null){
+            return question.getTxt();
+        }else{
+            // 不存在，设置默认值并保存
+            question.setTxt("约吗？叔叔带你去看金鱼~");
+            userQuestionApi.addQuestion(question);
+            return "约吗？叔叔带你去看金鱼~";
+        }
     }
 }
