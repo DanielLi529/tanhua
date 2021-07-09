@@ -4,15 +4,19 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.tanhua.domain.db.Settings;
 import com.tanhua.domain.mongo.Friend;
+import com.tanhua.domain.mongo.Video;
+import com.tanhua.domain.vo.PageResult;
 import com.tanhua.dubbo.mapper.UserSettingMapper;
 import org.apache.dubbo.config.annotation.Service;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 
 import java.util.Date;
+import java.util.List;
 
 @Service
 public class MessageImpl implements MessageApi {
@@ -20,6 +24,11 @@ public class MessageImpl implements MessageApi {
     @Autowired
     private MongoTemplate mongoTemplate;
 
+    /**
+    * @Desc: 添加好友
+    * @Param: [userId, friendUserId]
+    * @return: void
+    */
     @Override
     public void addFriends(Long userId, Long friendUserId) {
         // 查询是否存在数据
@@ -53,7 +62,31 @@ public class MessageImpl implements MessageApi {
 
             mongoTemplate.save(friend);
         }
+    }
 
+    /**
+    * @Desc: 获取好友列表
+    * @Param: [page, pagesize, keyword, userId]
+    * @return: com.tanhua.domain.vo.PageResult
+    */
+    @Override
+    public PageResult queryFriends(Integer page, Integer pagesize, String keyword, Long userId) {
+        // 定义查询条件
+        Query query = new Query();
+        // 获取总行数
+        long count = mongoTemplate.count(query, Friend.class);
 
+        query.addCriteria(Criteria.where("userId").is(userId));
+        query.with(Sort.by(Sort.Direction.DESC, "created"));
+        query.limit(pagesize).skip((page - 1) * pagesize);
+
+        // 获取符合条件的好友记录
+        List<Friend> friends = mongoTemplate.find(query, Friend.class);
+
+        // 获取总页数,封装 pageResult 对象
+        long pages = count / pagesize + count % pagesize > 0 ? 1 : 0;
+        PageResult pageResult = new PageResult(count, (long) pagesize, pages, (long) page, friends);
+
+        return pageResult;
     }
 }
