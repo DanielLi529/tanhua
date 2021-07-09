@@ -198,11 +198,11 @@ public class MovementsService {
     * @Param: [page, pagesize]
     * @return: com.tanhua.domain.vo.PageResult
     */
-    public PageResult queryMyPublishList(Integer page, Integer pagesize) {
+    public PageResult queryMyPublishList(Integer page, Integer pagesize,Integer userId) {
         List<MomentVo> momentVos = new ArrayList<>();
 
         // 获取所有的动态信息
-        PageResult pageResult = movementsApi.queryMyPublishList(page,pagesize,UserHolder.getUserId());
+        PageResult pageResult = movementsApi.queryMyPublishList(page,pagesize,userId.longValue());
 
         // 循环遍历
         List<Publish> publishes = pageResult.getItems();

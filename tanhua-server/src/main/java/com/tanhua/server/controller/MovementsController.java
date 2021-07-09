@@ -56,8 +56,8 @@ public class MovementsController {
      * 我的动态
      */
     @RequestMapping(value = "/all", method = RequestMethod.GET)
-    public ResponseEntity queryMyPublishList(Integer page, Integer pagesize) {
-        PageResult pageResult = movementsService.queryMyPublishList(page, pagesize);
+    public ResponseEntity queryMyPublishList(Integer page, Integer pagesize, Integer userId) {
+        PageResult pageResult = movementsService.queryMyPublishList(page, pagesize, userId);
         return ResponseEntity.ok(pageResult);
     }
 

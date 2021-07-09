@@ -106,4 +106,6 @@ public class SmallVideosApiImpl implements SmallVideosApi {
         mongoTemplate.remove(query,FollowUser.class);
     }
 
+
+
 }

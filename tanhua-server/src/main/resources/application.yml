@@ -56,3 +56,9 @@ tanhua:
     appId: 24447715
     apiKey: PLuQZEvOD6dmny7WZrGZMNcz
     secretKey: gsqWgxxULsaMwOldrxXozTGWs8T7C0PK
+  huanxin:
+    url: http://a1.easemob.com/
+    orgName: 1131210709083867
+    appName: tanhua
+    clientId: YXA6NNy0OjmlRXyWvBjp2VQyzA
+    clientSecret: YXA6MY-bX3gZ2As5Yls5IQmg1GskqjQ

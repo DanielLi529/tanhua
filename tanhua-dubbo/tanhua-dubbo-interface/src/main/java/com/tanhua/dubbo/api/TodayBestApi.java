@@ -10,4 +10,11 @@ public interface TodayBestApi {
      * @param userId
      */
     RecommendUser findTodayBest(Long userId);
+
+    /**
+    * @Desc: 查询和当前佳人是否存在缘分
+    * @Param: [id, userId]
+    * @return: com.tanhua.domain.mongo.RecommendUser
+    */
+    RecommendUser findPersonInfo(Long id, Long userId);
 }

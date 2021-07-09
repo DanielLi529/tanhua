@@ -29,4 +29,20 @@ public class TodayBestApiImpl implements TodayBestApi {
 
         return mongoTemplate.findOne(query,RecommendUser.class);
     }
+
+    /**
+    * @Desc: 查询和当前佳人是否存在缘分
+    * @Param: [id, userId]
+    * @return: com.tanhua.domain.mongo.RecommendUser
+    */
+    @Override
+    public RecommendUser findPersonInfo(Long id, Long userId) {
+        // 设置查询条件
+        Query query = new Query();
+        query.addCriteria(Criteria.where("userId").is(userId).
+                and("toUserId").is(id));
+
+        RecommendUser one = mongoTemplate.findOne(query, RecommendUser.class);
+        return one;
+    }
 }

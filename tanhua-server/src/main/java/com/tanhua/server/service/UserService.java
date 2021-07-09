@@ -3,6 +3,7 @@ package com.tanhua.server.service;
 import com.alibaba.fastjson.JSON;
 import com.tanhua.commons.exception.TanHuaException;
 import com.tanhua.commons.templates.FaceTemplate;
+import com.tanhua.commons.templates.HuanXinTemplate;
 import com.tanhua.commons.templates.OssTemplate;
 import com.tanhua.commons.templates.SmsTemplate;
 import com.tanhua.domain.db.User;
@@ -57,6 +58,9 @@ public class UserService {
 
     @Autowired
     private OssTemplate ossTemplate;
+
+    @Autowired
+    private HuanXinTemplate huanXinTemplate;
 
     @Autowired
     private FaceTemplate faceTemplate;
@@ -174,6 +178,8 @@ public class UserService {
             Long userId = userApi.save(user);
             // 给对象ID值
             user.setId(userId);
+            // 注册环信
+            huanXinTemplate.register(user.getId());
             isNew = true;
         }
 

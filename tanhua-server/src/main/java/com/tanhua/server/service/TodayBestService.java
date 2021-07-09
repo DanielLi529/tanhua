@@ -11,6 +11,7 @@ import com.tanhua.dubbo.api.TodayBestApi;
 import com.tanhua.dubbo.api.UserInfoApi;
 import com.tanhua.server.interceptor.UserHolder;
 import org.apache.commons.lang3.RandomUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.Reference;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -119,13 +120,6 @@ public class TodayBestService {
         }
 
         pageResult.setItems(todayBestVos);
-//
-//        // 为对象赋值
-//        todayBestVoPageResult.setCounts(pageResult.getCounts());
-//        todayBestVoPageResult.setPagesize(pageResult.getPagesize());
-//        todayBestVoPageResult.setPages(pageResult.getPages());
-//        todayBestVoPageResult.setPage(pageResult.getPage());
-//        todayBestVoPageResult.setItems(todayBestVos);
 
         return pageResult;
     }
@@ -141,5 +135,39 @@ public class TodayBestService {
             records.add(recommendUser);
         }
         return records;
+    }
+
+    /**
+    * @Desc: 佳人信息
+    * @Param: [id]
+    * @return: com.tanhua.domain.vo.TodayBestVo
+    */
+    public TodayBestVo findPersonInfo(Long id) {
+        // 创建 todayBestVo 对象
+        TodayBestVo todayBestVo = new TodayBestVo();
+
+
+        // 通过 佳人id 查询详细的用户信息
+        UserInfo userInfo = userInfoApi.getUserInfo(id);
+
+        BeanUtils.copyProperties(userInfo, todayBestVo);
+
+        // 查询 mongo ,返回用户 id
+        RecommendUser bestUser = todayBestApi.findPersonInfo(id, UserHolder.getUserId());
+
+        // 判断
+        if (bestUser == null) {
+            // 没有查询到佳人信息
+            bestUser = new RecommendUser();
+            bestUser.setScore(95.63d);
+        }
+        // 切割 tag
+        if (userInfo.getTags() != null) {
+            todayBestVo.setTags(userInfo.getTags().split(","));
+        }
+
+        // 设置缘分值
+        todayBestVo.setFateValue(bestUser.getScore().longValue());
+        return todayBestVo;
     }
 }

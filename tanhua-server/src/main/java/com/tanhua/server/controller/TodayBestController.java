@@ -39,4 +39,14 @@ public class TodayBestController {
         // 调用 service
         return ResponseEntity.ok(todayBestService.findRecommendation(param));
     }
+
+    /**
+     * 佳人信息
+     */
+    @RequestMapping(value = "/{id}/personalInfo", method = RequestMethod.GET)
+    public ResponseEntity findPersonInfo(@PathVariable("id") Long id) {
+        // 调用 service
+        TodayBestVo todayBestVo = todayBestService.findPersonInfo(id);
+        return ResponseEntity.ok(todayBestVo);
+    }
 }
