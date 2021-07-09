@@ -1,6 +1,8 @@
 package com.tanhua.server.service;
 
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
+import com.tanhua.commons.templates.HuanXinTemplate;
 import com.tanhua.domain.db.Question;
 import com.tanhua.domain.db.UserInfo;
 import com.tanhua.domain.mongo.RecommendUser;
@@ -15,11 +17,15 @@ import com.tanhua.server.interceptor.UserHolder;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.Reference;
+import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 今日佳人管理业务层
@@ -38,6 +44,9 @@ public class TodayBestService {
 
     @Reference
     private UserQuestionApi userQuestionApi;
+
+    @Autowired
+    private HuanXinTemplate huanXinTemplate;
 
     /**
      * @Desc: 每日佳人
@@ -188,11 +197,46 @@ public class TodayBestService {
         // 存在该条数据
         if (question != null && question.getTxt() != null){
             return question.getTxt();
-        }else{
+        }else if(question != null){
             // 不存在，设置默认值并保存
             question.setTxt("约吗？叔叔带你去看金鱼~");
             userQuestionApi.addQuestion(question);
             return "约吗？叔叔带你去看金鱼~";
+        }else {
+            return "约吗？叔叔带你去看金鱼~";
         }
+    }
+
+    // 回复陌生人问题
+    public void replyPersonQuestion(Long userId, String reply) {
+        // 查询用户名
+        UserInfo userInfo = userInfoApi.getUserInfo(UserHolder.getUserId());
+        String nickname = "";
+        if (userInfo != null){
+            nickname = userInfo.getNickname();
+        }
+
+        // 查询用户问题
+        Question question = userQuestionApi.selectQuestion(userId);
+        String txt = "";
+        if (question != null){
+            txt = question.getTxt();
+        }
+
+        // 封装数据
+        Map<String, String> map = new HashMap<>();
+
+//        {"userId": "1","nickname":"黑马小妹",
+//        "strangerQuestion": "你喜欢去看蔚蓝的大海还是去爬巍峨的高山？",
+//        "reply": "我喜欢秋天的落叶，夏天的泉水，冬天的雪地，只要有你一切皆可~"}
+        map.put("userId", UserHolder.getUserId().toString());
+        map.put("nickname", nickname);
+        map.put("strangerQuestion", txt);
+        map.put("reply", reply);
+
+        // 转换为 json 格式
+        String msg = JSON.toJSONString(map);
+
+        huanXinTemplate.sendMsg(userId + "", msg);
     }
 }

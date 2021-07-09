@@ -59,4 +59,14 @@ public class TodayBestController {
         String question = todayBestService.findPersonQuestion(id);
         return ResponseEntity.ok(question);
     }
+
+    /**
+     * 回复佳人的问题
+     */
+    @RequestMapping(value = "/strangerQuestions", method = RequestMethod.POST)
+    public ResponseEntity replyPersonQuestion(Long userId, String reply) {
+        // 调用 service
+        todayBestService.replyPersonQuestion(userId, reply);
+        return ResponseEntity.ok(null);
+    }
 }
