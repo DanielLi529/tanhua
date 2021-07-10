@@ -5,8 +5,10 @@ import com.tanhua.domain.db.UserInfo;
 import com.tanhua.domain.mongo.Comment;
 import com.tanhua.domain.mongo.MomentVo;
 import com.tanhua.domain.mongo.Publish;
+import com.tanhua.domain.mongo.Visitor;
 import com.tanhua.domain.vo.PageResult;
 import com.tanhua.domain.vo.PublishVo;
+import com.tanhua.domain.vo.VisitorVo;
 import com.tanhua.dubbo.api.CommentsApi;
 import com.tanhua.dubbo.api.MovementsApi;
 import com.tanhua.dubbo.api.UserInfoApi;
@@ -405,5 +407,41 @@ public class MovementsService {
 
         // 返回数据
         return momentVo;
+    }
+
+    /**
+    * @Desc: 谁看过我
+    * @Param: []
+    * @return: com.tanhua.domain.vo.VisitorVo
+    */
+    public ArrayList<VisitorVo> queryVisitors() {
+        // 获取 Visitor 对象数据
+        List<Visitor> visitors = movementsApi.queryVisitors(UserHolder.getUserId());
+
+        // 创建集合存储返回值对象
+        ArrayList<VisitorVo> visitorVos = new ArrayList<>();
+        if (visitors != null){
+            // 不为空则copy属性
+            for (Visitor visitor : visitors) {
+                // 创建对象
+                VisitorVo visitorVo = new VisitorVo();
+                BeanUtils.copyProperties(visitor,visitorVo);
+
+                // 查询用户的详细信息
+                UserInfo userInfo = userInfoApi.getUserInfo(visitor.getVisitorUserId());
+                BeanUtils.copyProperties(userInfo, visitorVo);
+
+                if (userInfo.getTags() != null) {
+                    visitorVo.setTags(userInfo.getTags().split(","));
+                }
+
+                // 为对象赋值
+                visitorVo.setFateValue(visitor.getScore().intValue());
+
+                visitorVos.add(visitorVo);
+            }
+
+        }
+        return visitorVos;
     }
 }

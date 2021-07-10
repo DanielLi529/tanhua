@@ -3,6 +3,7 @@ package com.tanhua.dubbo.api;
 import com.tanhua.domain.db.Settings;
 import com.tanhua.domain.mongo.Comment;
 import com.tanhua.domain.mongo.Publish;
+import com.tanhua.domain.mongo.Visitor;
 import com.tanhua.domain.vo.PageResult;
 import com.tanhua.domain.vo.PublishVo;
 
@@ -59,4 +60,11 @@ public interface MovementsApi {
      * @return: com.tanhua.domain.mongo.Publish
      */
     Publish queryPublishById(String publishId);
+
+    /**
+    * @Desc: 谁看过我
+    * @Param: [userId]
+    * @return: java.util.List<com.tanhua.domain.mongo.Visitor>
+    */
+    List<Visitor> queryVisitors(Long userId);
 }

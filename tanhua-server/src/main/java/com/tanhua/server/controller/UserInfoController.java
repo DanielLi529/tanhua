@@ -1,5 +1,6 @@
 package com.tanhua.server.controller;
 
+import com.tanhua.domain.vo.CountsVo;
 import com.tanhua.domain.vo.UserInfoVo;
 import com.tanhua.server.service.UserInfoService;
 import com.tanhua.server.service.UserService;
@@ -48,5 +49,14 @@ public class UserInfoController {
     public ResponseEntity updateUserInfo(MultipartFile headPhoto) {
         userInfoService.updateUserHead(headPhoto);
         return ResponseEntity.ok(null);
+    }
+
+    /**
+     * 互相喜欢，喜欢，粉丝
+     */
+    @RequestMapping(value = "/counts", method = RequestMethod.GET)
+    public ResponseEntity queryCounts() {
+        CountsVo countsVo = userInfoService.queryCounts();
+        return ResponseEntity.ok(countsVo);
     }
 }

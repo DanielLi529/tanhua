@@ -79,7 +79,6 @@ public class MessageService {
             }
             pageResult.setItems(list);
         }
-
         // 返回数据
         return pageResult;
     }
@@ -115,7 +114,6 @@ public class MessageService {
             }
             pageResult.setItems(messageVos);
         }
-
         return pageResult;
     }
 }

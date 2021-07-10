@@ -29,4 +29,25 @@ public interface UserInfoApi {
     * @return: void
     */
     void updateUserHead(UserInfo userInfo);
+
+    /**
+    * @Desc: 喜欢的数量
+    * @Param: [userId]
+    * @return: java.lang.Long
+    */
+    Long queryLoveCount(Long userId);
+
+    /**
+    * @Desc: 粉丝数量
+    * @Param: [userId]
+    * @return: java.lang.Long
+    */
+    Long queryFansCount(Long userId);
+
+    /**
+    * @Desc: 相互喜欢的数量
+    * @Param: [userId]
+    * @return: java.lang.Long
+    */
+    Long queryEachLoveCount(Long userId);
 }

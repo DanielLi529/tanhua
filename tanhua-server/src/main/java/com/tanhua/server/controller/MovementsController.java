@@ -3,6 +3,7 @@ package com.tanhua.server.controller;
 import com.tanhua.domain.mongo.MomentVo;
 import com.tanhua.domain.vo.PageResult;
 import com.tanhua.domain.vo.PublishVo;
+import com.tanhua.domain.vo.VisitorVo;
 import com.tanhua.server.service.MovementsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 
 /**
@@ -103,5 +105,14 @@ public class MovementsController {
     public ResponseEntity queryComments(@PathVariable("id") String publishId) {
         MomentVo momentVo = movementsService.queryComment(publishId);
         return ResponseEntity.ok(momentVo);
+    }
+
+    /**
+     * 谁看过我
+     */
+    @RequestMapping(value = "/visitors", method = RequestMethod.GET)
+    public ResponseEntity queryVisitors() {
+        ArrayList<VisitorVo> visitorVos = movementsService.queryVisitors();
+        return ResponseEntity.ok(visitorVos);
     }
 }

@@ -269,4 +269,14 @@ public class MovementsApiImpl implements MovementsApi {
     public Publish queryPublishById(String publishId) {
         return mongoTemplate.findById(new ObjectId(publishId), Publish.class);
     }
+
+    /**
+    * @Desc: 谁看过我
+    * @Param: [userId]
+    * @return: java.util.List<com.tanhua.domain.mongo.Visitor>
+    */
+    @Override
+    public List<Visitor> queryVisitors(Long userId) {
+        return null;
+    }
 }

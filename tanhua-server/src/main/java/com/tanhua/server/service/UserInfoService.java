@@ -6,8 +6,11 @@ import com.tanhua.commons.templates.FaceTemplate;
 import com.tanhua.commons.templates.OssTemplate;
 import com.tanhua.domain.db.User;
 import com.tanhua.domain.db.UserInfo;
+import com.tanhua.domain.mongo.Comment;
+import com.tanhua.domain.vo.CountsVo;
 import com.tanhua.domain.vo.ErrorResult;
 import com.tanhua.domain.vo.UserInfoVo;
+import com.tanhua.dubbo.api.CommentsApi;
 import com.tanhua.dubbo.api.UserInfoApi;
 import com.tanhua.server.TanhuaServerApplication;
 import com.tanhua.server.interceptor.UserHolder;
@@ -66,6 +69,11 @@ public class UserInfoService {
         return userInfoVo;
     }
 
+    /**
+    * @Desc: 更新用户信息
+    * @Param: [userInfoVo]
+    * @return: void
+    */
     public void updateUserInfo(UserInfoVo userInfoVo) {
         // 获取用户 id
         Long id = UserHolder.getUserId();
@@ -81,6 +89,11 @@ public class UserInfoService {
         userInfoApi.updateUserInfo(userInfo);
     }
 
+    /**
+    * @Desc: 更新用户头像
+    * @Param: [headPhoto]
+    * @return: void
+    */
     public void updateUserHead(MultipartFile headPhoto) {
         try {
             // 获取用户 id
@@ -108,7 +121,29 @@ public class UserInfoService {
         } catch (IOException e) {
             throw new TanHuaException(ErrorResult.error());
         }
+    }
 
+    /**
+    * @Desc: 互相喜欢，喜欢，粉丝 数量
+    * @Param: []
+    * @return: com.tanhua.domain.vo.CountsVo
+    */
+    public CountsVo queryCounts() {
+        Long userId = UserHolder.getUserId();
+        // 获取喜欢的数量
+        Long loveCount = userInfoApi.queryLoveCount(userId);
 
+        // 获取粉丝的数量
+        Long fansCount = userInfoApi.queryFansCount(userId);
+
+        // 获取好友的数量
+        Long mutualCount = userInfoApi.queryEachLoveCount(userId);
+
+        // 创建对象
+        CountsVo countsVo = new CountsVo();
+        countsVo.setLoveCount(loveCount);
+        countsVo.setFanCount(fansCount);
+        countsVo.setEachLoveCount(mutualCount);
+        return countsVo;
     }
 }
