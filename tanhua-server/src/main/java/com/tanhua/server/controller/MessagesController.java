@@ -46,7 +46,8 @@ public class MessagesController {
     @RequestMapping(value = "/loves", method = RequestMethod.GET)
     public ResponseEntity queryLoveList(@RequestParam(defaultValue = "1") Integer page,
                                        @RequestParam(defaultValue = "10") Integer pagesize) {
-        PageResult pageResult = messageService.queryLoveList(page, pagesize);
+        Integer commentType = 3;
+        PageResult pageResult = messageService.queryLoveList(page, pagesize, commentType);
         return ResponseEntity.ok(pageResult);
     }
 
@@ -56,7 +57,8 @@ public class MessagesController {
     @RequestMapping(value = "/likes", method = RequestMethod.GET)
     public ResponseEntity queryLikeList(@RequestParam(defaultValue = "1") Integer page,
                                         @RequestParam(defaultValue = "10") Integer pagesize) {
-        PageResult pageResult = messageService.queryLikeList(page, pagesize);
+        Integer commentType = 1;
+        PageResult pageResult = messageService.queryLoveList(page, pagesize, commentType);
         return ResponseEntity.ok(pageResult);
     }
 
@@ -66,7 +68,8 @@ public class MessagesController {
     @RequestMapping(value = "/comments", method = RequestMethod.GET)
     public ResponseEntity queryCommentsList(@RequestParam(defaultValue = "1") Integer page,
                                         @RequestParam(defaultValue = "10") Integer pagesize) {
-        PageResult pageResult = messageService.queryCommentsList(page, pagesize);
+        Integer commentType = 2;
+        PageResult pageResult = messageService.queryLoveList(page, pagesize, commentType);
         return ResponseEntity.ok(pageResult);
     }
 }

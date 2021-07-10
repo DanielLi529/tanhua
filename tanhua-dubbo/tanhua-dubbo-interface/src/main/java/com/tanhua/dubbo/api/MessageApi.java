@@ -25,5 +25,5 @@ public interface MessageApi {
     * @Param: [page, pagesize, userId]
     * @return: com.tanhua.domain.vo.PageResult
     */
-    PageResult queryLoveList(Integer page, Integer pagesize, Long userId);
+    PageResult queryLoveList(Integer page, Integer pagesize, Long userId, Integer commentType);
 }

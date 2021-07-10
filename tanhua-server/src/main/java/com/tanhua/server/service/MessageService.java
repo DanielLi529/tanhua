@@ -85,14 +85,13 @@ public class MessageService {
     }
 
     /**
-    * @Desc: 喜欢列表
+    * @Desc: 获取评论列表
     * @Param: [page, pagesize]
     * @return: com.tanhua.domain.vo.PageResult
     */
-    public PageResult queryLoveList(Integer page, Integer pagesize) {
-
+    public PageResult queryLoveList(Integer page, Integer pagesize, Integer commentType) {
         // 查询点赞的用户 id
-        PageResult pageResult = messageApi.queryLoveList(page, pagesize, UserHolder.getUserId());
+        PageResult pageResult = messageApi.queryLoveList(page, pagesize, UserHolder.getUserId(), commentType);
 
         // 创建集合 用来存储返回值对象
         ArrayList<MessageVo> messageVos = new ArrayList<>();
@@ -118,23 +117,5 @@ public class MessageService {
         }
 
         return pageResult;
-    }
-
-    /**
-    * @Desc: 点赞列表
-    * @Param: [page, pagesize]
-    * @return: com.tanhua.domain.vo.PageResult
-    */
-    public PageResult queryLikeList(Integer page, Integer pagesize) {
-        return null;
-    }
-
-    /**
-    * @Desc: 评论列表
-    * @Param: [page, pagesize]
-    * @return: com.tanhua.domain.vo.PageResult
-    */
-    public PageResult queryCommentsList(Integer page, Integer pagesize) {
-        return null;
     }
 }

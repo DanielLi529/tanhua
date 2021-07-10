@@ -97,12 +97,12 @@ public class MessageImpl implements MessageApi {
     * @return: com.tanhua.domain.vo.PageResult
     */
     @Override
-    public PageResult queryLoveList(Integer page, Integer pagesize, Long userId) {
+    public PageResult queryLoveList(Integer page, Integer pagesize, Long userId, Integer commentType) {
         // 定义查询条件
         Query query = new Query();
 
         query.addCriteria(Criteria.where("publishUserId").is(userId)
-                .and("commentType").is(3));
+                .and("commentType").is(commentType));
         query.with(Sort.by(Sort.Direction.DESC, "created"));
         query.limit(pagesize).skip((page - 1) * pagesize);
 
