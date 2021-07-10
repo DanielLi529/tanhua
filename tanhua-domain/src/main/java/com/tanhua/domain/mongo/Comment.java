@@ -21,7 +21,7 @@ public class Comment implements Serializable {
     private Long created; //发表时间
 
     // 添加一列，用来存储评论的动态的发布人 UserId
-    private Long PublishUserId;
+    private Long publishUserId;
 
     //动态选择更新的字段
     public String getCol() {

@@ -39,4 +39,34 @@ public class MessagesController {
         PageResult pageResult = messageService.queryFriends(page, pagesize, keyword);
         return ResponseEntity.ok(pageResult);
     }
+
+    /**
+     * 喜欢列表
+     */
+    @RequestMapping(value = "/loves", method = RequestMethod.GET)
+    public ResponseEntity queryLoveList(@RequestParam(defaultValue = "1") Integer page,
+                                       @RequestParam(defaultValue = "10") Integer pagesize) {
+        PageResult pageResult = messageService.queryLoveList(page, pagesize);
+        return ResponseEntity.ok(pageResult);
+    }
+
+    /**
+     * 点赞列表
+     */
+    @RequestMapping(value = "/likes", method = RequestMethod.GET)
+    public ResponseEntity queryLikeList(@RequestParam(defaultValue = "1") Integer page,
+                                        @RequestParam(defaultValue = "10") Integer pagesize) {
+        PageResult pageResult = messageService.queryLikeList(page, pagesize);
+        return ResponseEntity.ok(pageResult);
+    }
+
+    /**
+     * 评论列表
+     */
+    @RequestMapping(value = "/comments", method = RequestMethod.GET)
+    public ResponseEntity queryCommentsList(@RequestParam(defaultValue = "1") Integer page,
+                                        @RequestParam(defaultValue = "10") Integer pagesize) {
+        PageResult pageResult = messageService.queryCommentsList(page, pagesize);
+        return ResponseEntity.ok(pageResult);
+    }
 }

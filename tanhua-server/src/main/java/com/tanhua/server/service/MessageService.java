@@ -2,14 +2,17 @@ package com.tanhua.server.service;
 
 import com.fasterxml.jackson.databind.util.BeanUtil;
 import com.tanhua.domain.db.UserInfo;
+import com.tanhua.domain.mongo.Comment;
 import com.tanhua.domain.mongo.Friend;
 import com.tanhua.domain.vo.ContactVo;
+import com.tanhua.domain.vo.MessageVo;
 import com.tanhua.domain.vo.PageResult;
 import com.tanhua.dubbo.api.MessageApi;
 import com.tanhua.dubbo.api.UserInfoApi;
 import com.tanhua.dubbo.api.UserSettingApi;
 import com.tanhua.server.interceptor.UserHolder;
 import org.apache.dubbo.config.annotation.Reference;
+import org.joda.time.DateTime;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
@@ -79,5 +82,59 @@ public class MessageService {
 
         // 返回数据
         return pageResult;
+    }
+
+    /**
+    * @Desc: 喜欢列表
+    * @Param: [page, pagesize]
+    * @return: com.tanhua.domain.vo.PageResult
+    */
+    public PageResult queryLoveList(Integer page, Integer pagesize) {
+
+        // 查询点赞的用户 id
+        PageResult pageResult = messageApi.queryLoveList(page, pagesize, UserHolder.getUserId());
+
+        // 创建集合 用来存储返回值对象
+        ArrayList<MessageVo> messageVos = new ArrayList<>();
+
+        // 获取所有的评论对象
+        List<Comment> comments = pageResult.getItems();
+        if (comments != null){
+            for (Comment comment : comments) {
+                // 创建返回值对象
+                MessageVo messageVo = new MessageVo();
+                // 使用评论人的 UserId 来获取他的详细信息
+                UserInfo userInfo = userInfoApi.getUserInfo(comment.getUserId());
+                // 为对象赋值
+                messageVo.setId(userInfo.getId().toString());
+                messageVo.setAvatar(userInfo.getAvatar());
+                messageVo.setNickname(userInfo.getNickname());
+                messageVo.setCreateDate(new DateTime(comment.getCreated()).toString("yyyy年MM月dd日 HH:mm"));
+
+                // 添加到集合中
+                messageVos.add(messageVo);
+            }
+            pageResult.setItems(messageVos);
+        }
+
+        return pageResult;
+    }
+
+    /**
+    * @Desc: 点赞列表
+    * @Param: [page, pagesize]
+    * @return: com.tanhua.domain.vo.PageResult
+    */
+    public PageResult queryLikeList(Integer page, Integer pagesize) {
+        return null;
+    }
+
+    /**
+    * @Desc: 评论列表
+    * @Param: [page, pagesize]
+    * @return: com.tanhua.domain.vo.PageResult
+    */
+    public PageResult queryCommentsList(Integer page, Integer pagesize) {
+        return null;
     }
 }

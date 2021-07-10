@@ -19,4 +19,11 @@ public interface MessageApi {
     * @return: com.tanhua.domain.vo.PageResult
     */
     PageResult queryFriends(Integer page, Integer pagesize, String keyword, Long userId);
+
+    /**
+    * @Desc: 喜欢列表
+    * @Param: [page, pagesize, userId]
+    * @return: com.tanhua.domain.vo.PageResult
+    */
+    PageResult queryLoveList(Integer page, Integer pagesize, Long userId);
 }

@@ -3,6 +3,7 @@ package com.tanhua.dubbo.api;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.tanhua.domain.db.Settings;
+import com.tanhua.domain.mongo.Comment;
 import com.tanhua.domain.mongo.Friend;
 import com.tanhua.domain.mongo.Video;
 import com.tanhua.domain.vo.PageResult;
@@ -82,6 +83,34 @@ public class MessageImpl implements MessageApi {
 
         // 获取符合条件的好友记录
         List<Friend> friends = mongoTemplate.find(query, Friend.class);
+
+        // 获取总页数,封装 pageResult 对象
+        long pages = count / pagesize + count % pagesize > 0 ? 1 : 0;
+        PageResult pageResult = new PageResult(count, (long) pagesize, pages, (long) page, friends);
+
+        return pageResult;
+    }
+
+    /**
+    * @Desc: 喜欢列表
+    * @Param: [page, pagesize, userId]
+    * @return: com.tanhua.domain.vo.PageResult
+    */
+    @Override
+    public PageResult queryLoveList(Integer page, Integer pagesize, Long userId) {
+        // 定义查询条件
+        Query query = new Query();
+
+        query.addCriteria(Criteria.where("publishUserId").is(userId)
+                .and("commentType").is(3));
+        query.with(Sort.by(Sort.Direction.DESC, "created"));
+        query.limit(pagesize).skip((page - 1) * pagesize);
+
+        // 获取总行数
+        long count = mongoTemplate.count(query, Comment.class);
+
+        // 获取符合条件的好友记录
+        List<Comment> friends = mongoTemplate.find(query, Comment.class);
 
         // 获取总页数,封装 pageResult 对象
         long pages = count / pagesize + count % pagesize > 0 ? 1 : 0;
