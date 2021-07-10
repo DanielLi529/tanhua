@@ -48,4 +48,17 @@ public class CommentsApiImpl implements CommentsApi {
         return pageResult;
     }
 
+    /**
+    * @Desc: 根据发布Id在发布表中查询用户的UserId
+    * @Param: [page, pagesize, movementId]
+    * @return: com.tanhua.domain.vo.PageResult
+    */
+    @Override
+    public Long queryUserIdByPublishId(String publishId) {
+
+        // 定义查询条件
+        Publish publish = mongoTemplate.findById(publishId, Publish.class);
+
+        return publish.getUserId();
+    }
 }

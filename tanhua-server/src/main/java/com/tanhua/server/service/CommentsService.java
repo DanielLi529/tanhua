@@ -81,17 +81,22 @@ public class CommentsService {
     * @Param: [movementId, comment]
     * @return: void
     */
-    public void addComment(String movementId, String commentText) {
+    public void addComment(String publishId, String commentText) {
         // 封装 commment 对象
         Comment comment = new Comment();
 
         comment.setUserId(UserHolder.getUserId());
         comment.setCommentType(2); // 点赞
         comment.setPubType(1); // 对动态操作
-        comment.setPublishId(new ObjectId(movementId));
+        comment.setPublishId(new ObjectId(publishId));
         comment.setId(new ObjectId());
         comment.setCreated(System.currentTimeMillis());
         comment.setContent(commentText); // 评论内容
+
+        // 获取该条评论的发布人 Id
+        Long userId = commentsApi.queryUserIdByPublishId(publishId);
+        // 给对象赋值
+        comment.setPublishUserId(userId);
 
         // 向评论表中添加数据
         movementsApi.save(comment);

@@ -7,6 +7,7 @@ import com.tanhua.domain.mongo.MomentVo;
 import com.tanhua.domain.mongo.Publish;
 import com.tanhua.domain.vo.PageResult;
 import com.tanhua.domain.vo.PublishVo;
+import com.tanhua.dubbo.api.CommentsApi;
 import com.tanhua.dubbo.api.MovementsApi;
 import com.tanhua.dubbo.api.UserInfoApi;
 import com.tanhua.server.interceptor.UserHolder;
@@ -39,6 +40,9 @@ public class MovementsService {
 
     @Reference
     private UserInfoApi userInfoApi;
+
+    @Reference
+    private CommentsApi commentsApi;
 
     @Autowired
     private OssTemplate ossTemplate;
@@ -272,6 +276,11 @@ public class MovementsService {
         comment.setId(new ObjectId());
         comment.setCreated(System.currentTimeMillis());
 
+        // 获取该条评论的发布人 Id
+        Long userId = commentsApi.queryUserIdByPublishId(publishId);
+        // 给对象赋值
+        comment.setPublishUserId(userId);
+
         // 添加评论信息
         Long total = movementsApi.save(comment);
 
@@ -321,6 +330,11 @@ public class MovementsService {
         comment.setPublishId(new ObjectId(publishId));
         comment.setId(new ObjectId());
         comment.setCreated(System.currentTimeMillis());
+
+        // 获取该条评论的发布人 Id
+        Long userId = commentsApi.queryUserIdByPublishId(publishId);
+        // 给对象赋值
+        comment.setPublishUserId(userId);
 
         // 添加评论信息
         Long total = movementsApi.save(comment);

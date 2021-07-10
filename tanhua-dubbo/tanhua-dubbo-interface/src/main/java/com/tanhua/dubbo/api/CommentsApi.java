@@ -13,4 +13,10 @@ public interface CommentsApi {
     */
     PageResult queryCommentList(Integer page, Integer pagesize, String movementId);
 
+    /**
+    * @Desc: 获取当前动态的发布人 Id
+    * @Param: [publishId]
+    * @return: java.lang.Long
+    */
+    Long queryUserIdByPublishId(String publishId);
 }
