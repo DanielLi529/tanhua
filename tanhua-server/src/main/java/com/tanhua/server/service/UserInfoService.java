@@ -1,18 +1,12 @@
 package com.tanhua.server.service;
 
-import com.alibaba.fastjson.JSON;
 import com.tanhua.commons.exception.TanHuaException;
 import com.tanhua.commons.templates.FaceTemplate;
 import com.tanhua.commons.templates.OssTemplate;
-import com.tanhua.domain.db.User;
 import com.tanhua.domain.db.UserInfo;
-import com.tanhua.domain.mongo.Comment;
-import com.tanhua.domain.vo.CountsVo;
-import com.tanhua.domain.vo.ErrorResult;
-import com.tanhua.domain.vo.UserInfoVo;
-import com.tanhua.dubbo.api.CommentsApi;
+import com.tanhua.domain.mongo.RecommendUser;
+import com.tanhua.domain.vo.*;
 import com.tanhua.dubbo.api.UserInfoApi;
-import com.tanhua.server.TanhuaServerApplication;
 import com.tanhua.server.interceptor.UserHolder;
 import com.tanhua.server.utils.GetAgeUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -25,6 +19,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class UserInfoService {
@@ -145,5 +141,49 @@ public class UserInfoService {
         countsVo.setFanCount(fansCount);
         countsVo.setEachLoveCount(mutualCount);
         return countsVo;
+    }
+
+    /**
+    * @Desc: 互相喜欢，喜欢，粉丝 用户信息
+    * @Param: [type, page, pagesize]
+    * @return: com.tanhua.domain.vo.PageResult
+    */
+    public PageResult queryFriendsInfo(int type, int page, int pagesize) {
+        // 获取当前用户Id
+        Long userId = UserHolder.getUserId();
+        PageResult pageResult = new PageResult();
+
+        // 判断 type 的类型
+        switch (type){
+            case 1:
+                pageResult = userInfoApi.findPageLikeEachOther(userId,page,pagesize);
+                break;
+            case 2:
+                pageResult = userInfoApi.findPageOneSideLike(userId,page,pagesize);
+                break;
+            case 3:
+                pageResult = userInfoApi.findPageFens(userId,page,pagesize);
+                break;
+            case 4:
+                pageResult = userInfoApi.findPageMyVisitors(userId,page,pagesize);
+                break;
+            default: break;
+        }
+        // 获取查询到的内容
+        List<RecommendUser> items = (List<RecommendUser>) pageResult.getItems();
+
+        List<FriendVo> list = new ArrayList<>();
+        for (RecommendUser item : items) {
+            // 获取用户信息
+            UserInfo info = userInfoApi.getUserInfo(item.getUserId());
+            FriendVo friendVo = new FriendVo();
+            BeanUtils.copyProperties(info, friendVo);
+            friendVo.setMatchRate(item.getScore().intValue());
+            // 将返回对象添加到集合中
+            list.add(friendVo);
+        }
+        // 返回数据
+        pageResult.setItems(list);
+        return pageResult;
     }
 }

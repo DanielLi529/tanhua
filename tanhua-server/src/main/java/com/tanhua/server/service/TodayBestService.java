@@ -6,9 +6,7 @@ import com.tanhua.commons.templates.HuanXinTemplate;
 import com.tanhua.domain.db.Question;
 import com.tanhua.domain.db.UserInfo;
 import com.tanhua.domain.mongo.RecommendUser;
-import com.tanhua.domain.vo.PageResult;
-import com.tanhua.domain.vo.RecommendUserQueryParam;
-import com.tanhua.domain.vo.TodayBestVo;
+import com.tanhua.domain.vo.*;
 import com.tanhua.dubbo.api.RecommendApi;
 import com.tanhua.dubbo.api.TodayBestApi;
 import com.tanhua.dubbo.api.UserInfoApi;
@@ -238,5 +236,34 @@ public class TodayBestService {
         String msg = JSON.toJSONString(map);
 
         huanXinTemplate.sendMsg(userId + "", msg);
+    }
+
+    /**
+    * @Desc: 搜附近的人
+    * @Param: [gender, distance]
+    * @return: java.util.List<com.tanhua.domain.vo.NearUserVo>
+    */
+    public List<NearUserVo> SearchNearUserInfo(String gender, String distance) {
+        Long userId = UserHolder.getUserId();
+        //2、调用API根据用户id，距离查询当前用户附近的人 List<UserLocationVo>
+        List<UserLocationVo> locations = todayBestApi.searchNear(userId,Long.valueOf(distance));
+        //3、循环附近的人所有数据
+        List<NearUserVo> userVoList = new ArrayList<>();
+        for (UserLocationVo location : locations) {
+            //4、调用UserInfoApi查询用户数据，构造NearUserVo对象
+            UserInfo info = userInfoApi.getUserInfo(location.getUserId());
+            if(info.getId().toString().equals(userId.toString())) {  //排除自己
+                continue;
+            }
+            if(gender !=null && !info.getGender().equals(gender)) { //排除性别不符合
+                continue;
+            }
+            NearUserVo vo = new NearUserVo();
+            vo.setUserId(info.getId());
+            vo.setAvatar(info.getAvatar());
+            vo.setNickname(info.getNickname());
+            userVoList.add(vo);
+        }
+        return userVoList;
     }
 }

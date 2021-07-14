@@ -1,6 +1,7 @@
 package com.tanhua.dubbo.api;
 
 import com.tanhua.domain.db.UserInfo;
+import com.tanhua.domain.vo.PageResult;
 
 
 public interface UserInfoApi {
@@ -50,4 +51,32 @@ public interface UserInfoApi {
     * @return: java.lang.Long
     */
     Long queryEachLoveCount(Long userId);
+
+    /**
+    * @Desc: 查询我喜欢的
+    * @Param: [userId, page, pagesize]
+    * @return: com.tanhua.domain.vo.PageResult
+    */
+    PageResult findPageLikeEachOther(Long userId, int page, int pagesize);
+
+    /**
+    * @Desc: 查询粉丝列表
+    * @Param: [userId, page, pagesize]
+    * @return: com.tanhua.domain.vo.PageResult
+    */
+    PageResult findPageOneSideLike(Long userId, int page, int pagesize);
+
+    /**
+    * @Desc: 相互喜欢
+    * @Param: [userId, page, pagesize]
+    * @return: com.tanhua.domain.vo.PageResult
+    */
+    PageResult findPageFens(Long userId, int page, int pagesize);
+
+    /**
+    * @Desc: 访客列表
+    * @Param: [userId, page, pagesize]
+    * @return: com.tanhua.domain.vo.PageResult
+    */
+    PageResult findPageMyVisitors(Long userId, int page, int pagesize);
 }

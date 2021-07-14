@@ -271,12 +271,48 @@ public class MovementsApiImpl implements MovementsApi {
     }
 
     /**
-    * @Desc: 谁看过我
+    * @Desc: 谁看过我 最近访客 5条记录
     * @Param: [userId]
     * @return: java.util.List<com.tanhua.domain.mongo.Visitor>
     */
     @Override
     public List<Visitor> queryVisitors(Long userId) {
-        return null;
+        Query query = new Query();
+
+        // 定义查询条件
+        query.addCriteria(Criteria.where("userId").is(userId));
+        query.with(Sort.by(Sort.Direction.DESC,"data"));
+        query.limit(5);
+
+        // 返回数据
+        return mongoTemplate.find(query, Visitor.class);
+    }
+
+    /**
+     * @Desc: 谁看过我 上次登录时间之后的访客 5条记录
+     * @Param: [userId]
+     * @return: java.util.List<com.tanhua.domain.mongo.Visitor>
+     */
+    @Override
+    public List<Visitor> queryLastVisitors(Long userId, String lastTime) {
+        Query query = new Query();
+
+        // 定义查询条件
+        query.addCriteria(Criteria.where("userId").is(userId).and("date").gt(lastTime));
+        query.with(Sort.by(Sort.Direction.DESC,"data"));
+        query.limit(5);
+
+        // 返回数据
+        return mongoTemplate.find(query, Visitor.class);
+    }
+
+    /**
+     * 保存访客记录
+     */
+    @Override
+    public void save(Visitor visitor) {
+        visitor.setId(ObjectId.get());
+        visitor.setDate(System.currentTimeMillis());
+        mongoTemplate.save(visitor);
     }
 }

@@ -15,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -112,7 +113,7 @@ public class MovementsController {
      */
     @RequestMapping(value = "/visitors", method = RequestMethod.GET)
     public ResponseEntity queryVisitors() {
-        ArrayList<VisitorVo> visitorVos = movementsService.queryVisitors();
+        List<VisitorVo> visitorVos = movementsService.queryVisitors();
         return ResponseEntity.ok(visitorVos);
     }
 }

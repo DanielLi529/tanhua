@@ -1,5 +1,6 @@
 package com.tanhua.server.controller;
 
+import com.tanhua.domain.vo.NearUserVo;
 import com.tanhua.domain.vo.RecommendUserQueryParam;
 import com.tanhua.domain.vo.SettingsVo;
 import com.tanhua.domain.vo.TodayBestVo;
@@ -9,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 
@@ -68,5 +70,16 @@ public class TodayBestController {
         // 调用 service
         todayBestService.replyPersonQuestion(userId, reply);
         return ResponseEntity.ok(null);
+    }
+
+    /**
+     * 搜附近的人
+     */
+    @RequestMapping(value = "/search", method = RequestMethod.GET)
+    public ResponseEntity SearchNearUserInfo(@RequestParam(required=false) String gender,
+                                             @RequestParam(defaultValue = "2000") String distance) {
+        // 调用 service
+        List<NearUserVo> list = todayBestService.SearchNearUserInfo(gender, distance);
+        return ResponseEntity.ok(list);
     }
 }

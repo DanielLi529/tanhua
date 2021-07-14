@@ -19,11 +19,7 @@ import org.bson.types.ObjectId;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -252,7 +248,6 @@ public class MovementsService {
                     }else{
                         momentVo.setHasLoved(0);
                     }
-
                     momentVos.add(momentVo);
                 }
             }
@@ -414,9 +409,25 @@ public class MovementsService {
     * @Param: []
     * @return: com.tanhua.domain.vo.VisitorVo
     */
-    public ArrayList<VisitorVo> queryVisitors() {
-        // 获取 Visitor 对象数据
-        List<Visitor> visitors = movementsApi.queryVisitors(UserHolder.getUserId());
+    public List<VisitorVo> queryVisitors() {
+        // 我们会将用户每次登陆的时间保存至 redis 中
+        // 先判断用户是否登陆过，再决定需要查询的数据内容
+        String key = "visitors_time_" + UserHolder.getUserId();
+        String lastTime = (String)redisTemplate.opsForValue().get(key);
+
+
+
+        List<Visitor> visitors = new ArrayList<>();
+        if (redisTemplate.opsForValue().get(key) == null){
+            // 没有登陆过 最近五天的
+            visitors = movementsApi.queryVisitors(UserHolder.getUserId());
+        }else{
+            // 登陆过  则获取最后一次登录至今记录中的五条数据
+            visitors = movementsApi.queryLastVisitors(UserHolder.getUserId(),lastTime);
+        }
+
+        // 在redis中记录用户本次的访问时间
+        redisTemplate.opsForValue().set(key,System.currentTimeMillis()+"");
 
         // 创建集合存储返回值对象
         ArrayList<VisitorVo> visitorVos = new ArrayList<>();
@@ -431,12 +442,15 @@ public class MovementsService {
                 UserInfo userInfo = userInfoApi.getUserInfo(visitor.getVisitorUserId());
                 BeanUtils.copyProperties(userInfo, visitorVo);
 
+                // 设置标签
                 if (userInfo.getTags() != null) {
                     visitorVo.setTags(userInfo.getTags().split(","));
                 }
 
                 // 为对象赋值
-                visitorVo.setFateValue(visitor.getScore().intValue());
+                if (visitor.getScore() != null){
+                    visitorVo.setFateValue(visitor.getScore().intValue());
+                }
 
                 visitorVos.add(visitorVo);
             }

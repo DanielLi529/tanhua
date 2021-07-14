@@ -1,6 +1,7 @@
 package com.tanhua.server.controller;
 
 import com.tanhua.domain.vo.CountsVo;
+import com.tanhua.domain.vo.PageResult;
 import com.tanhua.domain.vo.UserInfoVo;
 import com.tanhua.server.service.UserInfoService;
 import com.tanhua.server.service.UserService;
@@ -58,5 +59,16 @@ public class UserInfoController {
     public ResponseEntity queryCounts() {
         CountsVo countsVo = userInfoService.queryCounts();
         return ResponseEntity.ok(countsVo);
+    }
+
+    /**
+     * 互相喜欢，喜欢，粉丝 数据查询
+     */
+    @RequestMapping(value = "/friends/{type}", method = RequestMethod.GET)
+    public ResponseEntity queryFriendsInfo(@PathVariable("type") int type,
+                                           @RequestParam(defaultValue = "1") int page,
+                                           @RequestParam(defaultValue = "10") int pagesize) {
+        PageResult pageResult = userInfoService.queryFriendsInfo(type, page, pagesize);
+        return ResponseEntity.ok(pageResult);
     }
 }

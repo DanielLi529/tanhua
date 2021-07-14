@@ -9,7 +9,6 @@ import com.tanhua.domain.vo.PublishVo;
 
 import java.util.List;
 
-
 public interface MovementsApi {
 
     /**
@@ -62,9 +61,22 @@ public interface MovementsApi {
     Publish queryPublishById(String publishId);
 
     /**
-    * @Desc: 谁看过我
+    * @Desc: 获取最近的五条数据
     * @Param: [userId]
     * @return: java.util.List<com.tanhua.domain.mongo.Visitor>
     */
     List<Visitor> queryVisitors(Long userId);
+
+    /**
+    * @Desc: 获取上次登录至今的五条数据
+    * @Param: [userId, lastTime]
+    * @return: java.util.List<com.tanhua.domain.mongo.Visitor>
+    */
+    List<Visitor> queryLastVisitors(Long userId, String lastTime);
+
+
+    /**
+     * 保存访客记录
+     */
+    void save(Visitor visitor);
 }
