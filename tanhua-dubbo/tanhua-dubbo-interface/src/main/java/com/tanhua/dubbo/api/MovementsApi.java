@@ -16,7 +16,7 @@ public interface MovementsApi {
     * @Param: [publishVo]
     * @return: void
     */
-    void createPublish(PublishVo publishVo);
+    String createPublish(PublishVo publishVo);
 
     /**
     * @Desc: 展示好友动态
@@ -79,4 +79,11 @@ public interface MovementsApi {
      * 保存访客记录
      */
     void save(Visitor visitor);
+
+    /**
+    * @Desc: 更新动态的审核状态
+    * @Param: [publishId, state]
+    * @return: void
+    */
+    void updatePublishState(String publishId, Integer state);
 }

@@ -124,6 +124,11 @@
                 <artifactId>commons-codec</artifactId>
                 <version>1.11</version>
             </dependency>
+            <dependency>
+                <groupId>com.apifan.common</groupId>
+                <artifactId>common-random</artifactId>
+                <version>1.0.5</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 

@@ -106,4 +106,14 @@ public class AdminService extends ServiceImpl<AdminMapper, Admin> {
         result.put("token",token);
         return result;
     }
+
+    /**
+    * @Desc: 退出登录
+    * @Param: [token]
+    * @return: void
+    */
+    public void logout(String token) {
+        // 删除 redis 中的 token
+        redisTemplate.delete(CACHE_KEY_CAP_PREFIX + token);
+    }
 }

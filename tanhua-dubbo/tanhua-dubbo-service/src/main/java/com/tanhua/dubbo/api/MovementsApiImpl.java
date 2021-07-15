@@ -56,7 +56,7 @@ public class MovementsApiImpl implements MovementsApi {
    * @return: void
    */
     @Override
-    public void createPublish(PublishVo publishVo) {
+    public String createPublish(PublishVo publishVo) {
 
         // 向动态表中插入 publish 对象
         long currentTimeMillis = System.currentTimeMillis();
@@ -88,6 +88,7 @@ public class MovementsApiImpl implements MovementsApi {
             timeLine.setId(ObjectId.get());
             mongoTemplate.save(timeLine,"quanzi_time_line_" + f.getFriendId());
         });
+        return publish.getId().toHexString();
     }
 
     /**
@@ -314,5 +315,20 @@ public class MovementsApiImpl implements MovementsApi {
         visitor.setId(ObjectId.get());
         visitor.setDate(System.currentTimeMillis());
         mongoTemplate.save(visitor);
+    }
+
+    /**
+    * @Desc: 更新动态的审核状态
+    * @Param: [publishId, state]
+    * @return: void
+    */
+    @Override
+    public void updatePublishState(String publishId, Integer state) {
+        Query query = new Query();
+        query.addCriteria(Criteria.where("id").is(publishId));
+
+        Update update = new Update();
+        update.set("state",state);
+        mongoTemplate.updateFirst(query,update,Publish.class);
     }
 }

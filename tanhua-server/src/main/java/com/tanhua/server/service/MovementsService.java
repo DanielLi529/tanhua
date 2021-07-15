@@ -15,10 +15,12 @@ import com.tanhua.dubbo.api.UserInfoApi;
 import com.tanhua.server.interceptor.UserHolder;
 import com.tanhua.server.utils.RelativeDateFormat;
 import org.apache.dubbo.config.annotation.Reference;
+import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.bson.types.ObjectId;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.messaging.MessagingException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -48,8 +50,11 @@ public class MovementsService {
     @Autowired
     private RedisTemplate redisTemplate;
 
+    @Autowired
+    private RocketMQTemplate rocketMQTemplate;
+
     /**
-     * @Desc: 展示用户通用设置
+     * @Desc: 发布动态
      * @Param: [headPhoto, token]
      * @return: void
      */
@@ -67,7 +72,11 @@ public class MovementsService {
         publishVo.setUserId(UserHolder.getUserId());
         publishVo.setMedias(medias);
 
-        movementsApi.createPublish(publishVo);
+        // 添加发布信息并返回发布Id
+         String publishId = movementsApi.createPublish(publishVo);
+
+        // 创建该条动态之后将对应的发布Id存储到消息队列,指定 生产者组 以及要 上传的内容
+        rocketMQTemplate.convertAndSend("tanhua_publish", publishId);
     }
 
     /**

@@ -10,10 +10,7 @@ import lombok.extern.log4j.Log4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -75,5 +72,17 @@ public class AdminController {
         AdminVo vo = new AdminVo();
         BeanUtils.copyProperties(admin, vo);
         return ResponseEntity.ok(vo);
+    }
+
+    /**
+     * @Desc: 用户登出
+     * @Param: []
+     * @return: org.springframework.http.ResponseEntity
+     */
+    @RequestMapping(value = "/logout", method = RequestMethod.POST)
+    public ResponseEntity logout(@RequestHeader("Authorization") String token) {
+        token = token.replace("Bearer ", "");
+        adminService.logout(token);
+        return ResponseEntity.ok(null);
     }
 }

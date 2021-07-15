@@ -28,6 +28,8 @@ public class Publish implements Serializable {
     private String latitude; //纬度
     private String locationName; //位置名称
     private Long created; //发布时间
+    // 添加动态的审核状态
+    private Integer state=0; // 0待审核 1审核通过 2驳回
 
     private Integer likeCount=0; //点赞数
     private Integer commentCount=0; //评论数

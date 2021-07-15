@@ -62,3 +62,8 @@ tanhua:
     appName: tanhua
     clientId: YXA6NNy0OjmlRXyWvBjp2VQyzA
     clientSecret: YXA6MY-bX3gZ2As5Yls5IQmg1GskqjQ
+
+rocketmq:
+  name-server: 10.10.20.160:9876
+  producer:
+    group: tanhua
